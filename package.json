@@ -1,0 +1,43 @@
+{
+  "name": "osp-snapshot-sdk",
+  "version": "0.0.1",
+  "description": "This is the snapshot sdk for OSP",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "author": "OSP",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/dengjizhang/osp-snapshot-sdk.git"
+  },
+  "homepage": "https://gitlab.com/dengjizhang",
+  "keywords": [
+    "osp",
+    "snapshot"
+  ],
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@apollo/client": "^3.11.10",
+    "@snapshot-labs/snapshot.js": "^0.12.28",
+    "typedoc": "^0.26.11"
+  },
+  "devDependencies": {
+    "@types/chai": "^5.0.1",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.9.0",
+    "chai": "^4.5.0",
+    "mocha": "^10.8.2",
+    "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3"
+  },
+  "scripts": {
+    "build": "tsup ./src/index.ts --format esm,cjs --dts",
+    "typedoc": "typedoc src/index.ts",
+    "test": "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/*.spec.ts"
+  }
+}
