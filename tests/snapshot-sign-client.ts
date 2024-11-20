@@ -10,7 +10,10 @@ console.log(account);
 
 async function main() {
   const sequencerUrl = "http://localhost:3001";
-  const signClient = new SnapShotSignClient(sequencerUrl,"osp_snapshot_apiKey");
+  const signClient = new SnapShotSignClient(
+    sequencerUrl,
+    "osp_snapshot_apiKey"
+  );
 
   const settings_json = {
     name: "ETHAN.OSP",
@@ -99,12 +102,15 @@ async function main() {
 
   // TODO: signVote
   // await signClient.signCreateOrUpdateVote(web3Provider, account, vote_message);
-  for (let i = 0; i < 1; i++) {
-    const randomWallet = Wallet.createRandom();
 
-    // TODO: signSetAlias
-    await signClient.signSetAlias(web3Provider, account, randomWallet.address);
-  }
+  const randomWallet = Wallet.createRandom();
+
+  // TODO: signSetAlias
+  // await signClient.signSetAlias(web3Provider, account, randomWallet.address);
+
+  await signClient.refreshProposalScores(
+    "0xcb3b86050bf255ba88893c633ee80f6abbf3dae30e49705f03edffcb6819c312"
+  );
 
   // await signClient.signFollowSpace(
   //   web3Provider,

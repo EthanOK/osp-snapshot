@@ -17,7 +17,8 @@ export enum FollowType {
  */
 export class SnapShotSignClient {
   private signClient: Client;
-
+  private sequencerUrl: string;
+  private apiKey: string;
 
   /**
    * Initialize the client
@@ -28,6 +29,8 @@ export class SnapShotSignClient {
     this.signClient = new snapshot.Client712(
       `${sequencerUrl}?${apiKey ? `apiKey=${apiKey}` : ""}`
     );
+    this.sequencerUrl = sequencerUrl;
+    this.apiKey = apiKey;
   }
 
   /**
@@ -189,6 +192,29 @@ export class SnapShotSignClient {
       return result;
     } catch (error) {
       console.log("error:", error);
+    }
+  }
+
+  /**
+   * Refresh proposal scores
+   * When the proposal.scores_state is pending, proposal.state is closed
+   * @param proposalId
+   * @returns
+   */
+  async refreshProposalScores(proposalId: string): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.sequencerUrl}/scores/${proposalId}?${
+          this.apiKey ? `apiKey=${this.apiKey}` : ""
+        }`
+      );
+
+      const result: any = await response.json();
+      console.log("result:", result.result);
+      return result as boolean;
+    } catch (error) {
+      console.log("error:", error);
+      return false;
     }
   }
 }
