@@ -15,73 +15,6 @@ async function main() {
     "osp_snapshot_apiKey"
   );
 
-  const settings_json = {
-    name: "ETHAN.OSP",
-    network: "11155111",
-    symbol: "OKB",
-    avatar: "",
-    website: "http://www.github.com",
-    twitter: "ethan",
-    private: false,
-    admins: ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"],
-    moderators: ["0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2"],
-    members: [],
-    categories: ["service"],
-    labels: [],
-    plugins: {},
-    children: [],
-    voting: { quorum: 0, hideAbstain: false },
-    strategies: [
-      {
-        name: "erc20-balance-of",
-        network: "11155111",
-        params: {
-          symbol: "OKB",
-          address: "0x3F4B6664338F23d2397c953f2AB4Ce8031663f80",
-          network: "11155111",
-          decimals: 18,
-        },
-      },
-    ],
-    validation: { name: "any", params: {} },
-    voteValidation: { name: "any", params: {} },
-    filters: { minScore: 0, onlyMembers: true },
-    treasuries: [],
-    boost: { enabled: true, bribeEnabled: false },
-  };
-
-  // TODO: signCreateOrUpdateSpace
-  // await signClient.signCreateOrUpdateSpace(
-  //   web3Provider,
-  //   account,
-  //   "ethan.osp",
-  //   settings_json
-  // );
-
-  const timestamp = Math.floor(Date.now() / 1e3);
-  const proposal_message: Proposal = {
-    space: "ethan.osp",
-    type: "single-choice",
-    title: "Test Proposal_" + timestamp,
-    body: "This is a test proposal body",
-    discussion: "",
-    choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-    labels: [],
-    start: timestamp,
-    end: timestamp + 6000,
-    snapshot: 7073819,
-    plugins: JSON.stringify({}),
-    app: "ops_snapshot",
-    timestamp: timestamp,
-  };
-
-  // TODO: signCreateProposal
-  // await signClient.signCreateProposal(
-  //   web3Provider,
-  //   account,
-  //   proposal_message
-  // );
-
   // TODO: signDeleteProposal
   // await signClient.signDeleteProposal(
   //   web3Provider,
@@ -90,18 +23,6 @@ async function main() {
   //   "0xc7c59cc9e3ecc497a856b09ca88ba2b8ef1bf3131d5477d0b5a12c1ea93390f4"
   // );
 
-  const vote_message: Vote = {
-    space: "ethan.osp",
-    proposal:
-      "0x190df1dbc7049eefc24e7e789fca68335a54ea1d9451dd0f07aa72cb25ea6322",
-    type: "single-choice",
-    choice: 3,
-    app: "ops_snapshot",
-    reason: "like 3",
-  };
-
-  // TODO: signVote
-  // await signClient.signCreateOrUpdateVote(web3Provider, account, vote_message);
 
   const randomWallet = Wallet.createRandom();
 

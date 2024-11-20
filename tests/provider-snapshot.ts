@@ -10,8 +10,7 @@ function getProvider(
   network: any,
   { broviderUrl = DEFAULT_BROVIDER_URL }: ProviderOptions = {}
 ) {
-  const url = `${broviderUrl}/${network}`;
-  if (network === "0") return new JsonRpcBatchProvider(broviderUrl);
+  const url = network === "0" ? broviderUrl : `${broviderUrl}/${network}`;
 
   const provider = new StaticJsonRpcProvider(
     {
@@ -26,12 +25,9 @@ function getProvider(
 
 async function main() {
   console.log("running");
-  
-
 
   const provider = getProvider("11155111");
-  const address = await provider.getSigner().getAddress();
-  console.log(address);
+
   console.log(await provider.getBlockNumber());
 
   // https://eth-sepolia.g.alchemy.com/v2/cylP6mC72Z7Nv-k3FehuXverOVumN-j2

@@ -72,7 +72,7 @@ export class SnapShotSignClient {
     web3: Web3Provider | Wallet,
     address: string,
     message: Proposal
-  ) {
+  ): Promise<any> {
     try {
       const result = await this.signClient.proposal(web3, address, message);
       console.log("result:", result);
@@ -96,7 +96,7 @@ export class SnapShotSignClient {
     address: string,
     spaceId: string,
     proposalId: string
-  ) {
+  ): Promise<any> {
     try {
       const result = await this.signClient.cancelProposal(web3, address, {
         space: spaceId,
@@ -121,7 +121,7 @@ export class SnapShotSignClient {
     web3: Web3Provider | Wallet,
     address: string,
     message: Vote
-  ) {
+  ): Promise<any> {
     try {
       const result = await this.signClient.vote(web3, address, message);
       console.log("result:", result);
@@ -143,7 +143,7 @@ export class SnapShotSignClient {
     web3: Web3Provider | Wallet,
     address: string,
     alias: string
-  ) {
+  ): Promise<any> {
     try {
       const result = await this.signClient.alias(web3, address, {
         alias: alias,
@@ -171,7 +171,7 @@ export class SnapShotSignClient {
     spaceId: string,
     type: FollowType,
     network = "s"
-  ) {
+  ): Promise<any> {
     try {
       let result: any;
       if (type === FollowType.UNFOLLOW) {
@@ -211,7 +211,7 @@ export class SnapShotSignClient {
 
       const result: any = await response.json();
       console.log("result:", result.result);
-      return result as boolean;
+      return result.result as boolean;
     } catch (error) {
       console.log("error:", error);
       return false;

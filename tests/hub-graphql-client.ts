@@ -7,6 +7,10 @@ async function main() {
   const scoreClient = new ScoreClient(score_URL, "osp_snapshot_apiKey");
 
   try {
+    const spaces = await queryClient.queryFollowSpace(
+      "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2"
+    );
+    console.log(spaces);
     const proposal = await queryClient.queryProposal(
       "0xcb3b86050bf255ba88893c633ee80f6abbf3dae30e49705f03edffcb6819c312"
     );

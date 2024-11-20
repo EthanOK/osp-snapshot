@@ -1,4 +1,4 @@
-import snapshotjs from "@snapshot-labs/snapshot.js";
+import snapshot from "@snapshot-labs/snapshot.js";
 
 export interface Strategy {
   name: string;
@@ -27,14 +27,14 @@ export class ScoreClient {
     account: string,
     network: string,
     strategies: any[],
-    snapshot: number,
+    snapshot_: number | "latest",
     space: string
   ) {
-    return await snapshotjs.utils.getVp(
+    return await snapshot.utils.getVp(
       account,
       network,
       strategies,
-      snapshot,
+      snapshot_,
       space,
       false,
       this.options

@@ -5,9 +5,9 @@ describe("Test SnapShot GraphQL Client", () => {
   const hub_URL = "http://localhost:3000";
   const queryClient = new SnapShotGraphQLClient(hub_URL, "osp_snapshot_apiKey");
 
+  const spaceId_ = "ethan.osp";
   let proposalId_ = null;
   let voter_ = null;
-  let spaceId_ = "oneone.eth";
 
   it("query Spaces Rankings", async () => {
     const data = await queryClient.querySpacesRankings();
@@ -42,17 +42,17 @@ describe("Test SnapShot GraphQL Client", () => {
   it("queryProposal by proposalId", async () => {
     const proposal = await queryClient.queryProposal(proposalId_);
     console.log("proposal author:", proposal.author);
-    voter_ = proposal.author;
   });
 
   it("queryVotes by proposalId", async () => {
-    const data = await queryClient.queryVotesByProposalId(
+    const voteslist = await queryClient.queryVotesByProposalId(
       {
         proposalId: proposalId_,
       },
       0
     );
-    console.log("votes number:", data.length);
+    console.log("votes list:\n", voteslist);
+    voter_ = voteslist[0].voter;
   });
 
   it("queryVotes by voter", async () => {
@@ -60,14 +60,19 @@ describe("Test SnapShot GraphQL Client", () => {
 
     console.log("votes number:", data.length);
     if (data.length > 0) {
-      console.log(
-        `${voter_} choice ${data[0].choice} in proposal ${data[0].proposal.id}`
-      );
+      for (const item of data) {
+        console.log(
+          `${voter_.substring(0, 8)} choice ${item.choice} in proposal ${
+            item.proposal.id
+          }`
+        );
+      }
     }
   });
 
   it("queryFollowSpace", async () => {
     const data = await queryClient.queryFollowSpace(voter_);
+    console.log(data)
     for (const item of data) {
       console.log("follow space:", item.space);
     }
