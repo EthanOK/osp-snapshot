@@ -14,14 +14,26 @@ async function main() {
     const proposal = await queryClient.queryProposal(
       "0xcb3b86050bf255ba88893c633ee80f6abbf3dae30e49705f03edffcb6819c312"
     );
-    const result = await scoreClient.getVotingPower(
+    const vp = await scoreClient.getVotingPower(
       "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2",
       proposal.network,
       proposal.strategies,
       proposal.snapshot,
       proposal.space
     );
-    console.log(result);
+    console.log(vp);
+
+    const scores = await scoreClient.getScores(
+      [
+        "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2",
+        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      ],
+      proposal.network,
+      proposal.strategies,
+      proposal.snapshot,
+      proposal.space
+    );
+    console.log(scores);
   } catch (error) {
     console.log(error);
   }

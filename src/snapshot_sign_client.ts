@@ -13,6 +13,18 @@ export enum FollowType {
 }
 
 /**
+ * Flag operation params
+ * @param type "space" | "proposal"
+ * @param action "flag" | "unflag" | "verify" | "hibernate" | "reactivate"
+ * @param value string
+ */
+export interface FlagOperationParams {
+  type: "space" | "proposal";
+  action: "flag" | "unflag" | "verify" | "hibernate" | "reactivate";
+  value: string;
+}
+
+/**
  * Sign client
  */
 export class SnapShotSignClient {
@@ -212,6 +224,40 @@ export class SnapShotSignClient {
       const result: any = await response.json();
       console.log("result:", result.result);
       return result.result as boolean;
+    } catch (error) {
+      console.log("error:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Flag operation (flag, unflag, verify, hibernate, reactivate) 
+   * @param params
+   * @param secret
+   * @returns
+   */
+  async flagOperation(
+    params: FlagOperationParams,
+    secret: string
+  ): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${this.sequencerUrl}/flag?${
+          this.apiKey ? `apiKey=${this.apiKey}` : ""
+        }`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            secret: secret,
+          },
+          body: JSON.stringify(params),
+        }
+      );
+
+      const result: any = await response.json();
+      console.log("result:", result.success);
+      return result.success as boolean;
     } catch (error) {
       console.log("error:", error);
       return false;

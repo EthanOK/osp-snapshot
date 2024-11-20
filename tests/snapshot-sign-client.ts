@@ -23,22 +23,23 @@ async function main() {
   //   "0xc7c59cc9e3ecc497a856b09ca88ba2b8ef1bf3131d5477d0b5a12c1ea93390f4"
   // );
 
-
   const randomWallet = Wallet.createRandom();
 
   // TODO: signSetAlias
   // await signClient.signSetAlias(web3Provider, account, randomWallet.address);
 
-  await signClient.refreshProposalScores(
-    "0xcb3b86050bf255ba88893c633ee80f6abbf3dae30e49705f03edffcb6819c312"
-  );
-
-  // await signClient.signFollowSpace(
-  //   web3Provider,
-  //   account,
-  //   "ethan.osp",
-  //   FollowType.UNFOLLOW
+  // await signClient.refreshProposalScores(
+  //   "0xcb3b86050bf255ba88893c633ee80f6abbf3dae30e49705f03edffcb6819c312"
   // );
+
+  await signClient.flagOperation(
+    {
+      type: "space",
+      action: "verify",
+      value: "ethan.osp",
+    },
+    "osp"
+  );
 }
 
 main();
