@@ -2,7 +2,7 @@ import {
   pinGraph,
   ProposalState,
   ScoreClient,
-  SnapShotGraphQLClient,
+  SnapShotGraphQLClient
 } from "../src";
 import { expect } from "chai";
 
@@ -22,8 +22,8 @@ describe("Test Boost Client", () => {
         proposal:
           "0x214288542f501685317f4d4cfb8c17f3ff84b52c4e1766096736e12251ab3613",
         eligibility: { type: "incentive" },
-        distribution: { type: "lottery", numWinners: "2" },
-      },
+        distribution: { type: "lottery", numWinners: "2" }
+      }
     };
 
     const ipfs = await pinGraph(data);

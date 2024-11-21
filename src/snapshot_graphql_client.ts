@@ -2,7 +2,7 @@ import {
   ApolloClient,
   InMemoryCache,
   NormalizedCacheObject,
-  gql,
+  gql
 } from "@apollo/client/core";
 import { cloneDeep } from "@apollo/client/utilities";
 import {
@@ -13,14 +13,14 @@ import {
   PROPOSALS_QUERY,
   SPACE_QUERY,
   SPACES_RANKING_QUERY,
-  VOTES_QUERY,
+  VOTES_QUERY
 } from "./utils/queries";
 
 export enum ProposalState {
   ALL = "all",
   ACTIVE = "active",
   PENDING = "pending",
-  CLOSED = "closed",
+  CLOSED = "closed"
 }
 
 /**
@@ -71,28 +71,28 @@ export interface QueryVotesParam {
 export class SnapShotGraphQLClient {
   apolloClient: ApolloClient<NormalizedCacheObject>;
 
-/**
- * Initialize client
- * @param hubUrl
- * @param apiKey
- */
+  /**
+   * Initialize client
+   * @param hubUrl
+   * @param apiKey
+   */
   constructor(hubUrl: string, apiKey?: string) {
     this.apolloClient = new ApolloClient({
       uri: `${hubUrl}/graphql?${apiKey ? `apiKey=${apiKey}` : ""}`,
       cache: new InMemoryCache({
-        addTypename: false,
+        addTypename: false
       }),
       defaultOptions: {
         query: {
-          fetchPolicy: "no-cache",
-        },
+          fetchPolicy: "no-cache"
+        }
       },
       typeDefs: gql`
         enum OrderDirection {
           asc
           desc
         }
-      `,
+      `
     });
   }
 
@@ -122,8 +122,8 @@ export class SnapShotGraphQLClient {
           private: false,
           search: params.search || undefined,
           network: params.network || undefined,
-          category: params.category || undefined,
-        },
+          category: params.category || undefined
+        }
       },
       "ranking"
     );
@@ -139,8 +139,8 @@ export class SnapShotGraphQLClient {
       {
         query: SPACE_QUERY,
         variables: {
-          id: spaceId,
-        },
+          id: spaceId
+        }
       },
       "space"
     );
@@ -162,8 +162,8 @@ export class SnapShotGraphQLClient {
           space_in: params.spaceIds,
           state: params.state,
           title_contains: params.title_contains,
-          flagged: false,
-        },
+          flagged: false
+        }
       },
       "proposals"
     );
@@ -179,8 +179,8 @@ export class SnapShotGraphQLClient {
       {
         query: PROPOSAL_QUERY,
         variables: {
-          id: proposalId,
-        },
+          id: proposalId
+        }
       },
       "proposal"
     );
@@ -203,8 +203,8 @@ export class SnapShotGraphQLClient {
           orderBy: "vp",
           orderDirection: queryParams.orderDirection || "desc",
           reason_not: queryParams.onlyWithReason ? "" : undefined,
-          voter: queryParams.voter || undefined,
-        },
+          voter: queryParams.voter || undefined
+        }
       },
       "votes"
     );
@@ -224,8 +224,8 @@ export class SnapShotGraphQLClient {
         variables: {
           first,
           skip,
-          voter: voter,
-        },
+          voter: voter
+        }
       },
       "votes"
     );
@@ -244,8 +244,8 @@ export class SnapShotGraphQLClient {
         variables: {
           address: account,
           alias: alias,
-          created_gt: Math.floor(Date.now() / 1000) - 30 * 60 * 60 * 24,
-        },
+          created_gt: Math.floor(Date.now() / 1000) - 30 * 60 * 60 * 24
+        }
       },
       "aliases"
     );
@@ -263,8 +263,8 @@ export class SnapShotGraphQLClient {
         query: FOLLOWS_QUERY,
         variables: {
           follower_in: account,
-          space_in: spaceId ? [spaceId] : undefined,
-        },
+          space_in: spaceId ? [spaceId] : undefined
+        }
       },
       "follows"
     );

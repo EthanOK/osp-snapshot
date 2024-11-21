@@ -29,7 +29,7 @@ describe("Test SnapShot GraphQL Client", () => {
   it("queryProposals by spaceIds", async () => {
     const proposals = await queryClient.queryProposals({
       spaceIds: [spaceId_],
-      state: ProposalState.ALL,
+      state: ProposalState.ALL
     });
     for (const proposal of proposals) {
       console.log("proposalId:", proposal.id);
@@ -47,7 +47,7 @@ describe("Test SnapShot GraphQL Client", () => {
   it("queryVotes by proposalId", async () => {
     const voteslist = await queryClient.queryVotesByProposalId(
       {
-        proposalId: proposalId_,
+        proposalId: proposalId_
       },
       0
     );
@@ -72,7 +72,7 @@ describe("Test SnapShot GraphQL Client", () => {
 
   it("queryFollowSpace", async () => {
     const data = await queryClient.queryFollowSpace(voter_);
-    console.log(data)
+    console.log(data);
     for (const item of data) {
       console.log("follow space:", item.space);
     }

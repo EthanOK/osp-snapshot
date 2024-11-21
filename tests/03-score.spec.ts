@@ -41,7 +41,7 @@ describe("Test Score Client", () => {
     const scores = await scoreClient.getScores(
       [
         "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2",
-        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
       ],
       proposal.network,
       proposal.strategies,
@@ -53,7 +53,7 @@ describe("Test Score Client", () => {
 
   it("get strategies", async () => {
     const strategies = await scoreClient.getStrategies();
-      expect(strategies).to.not.be.null;
+    expect(strategies).to.not.be.null;
   });
 
   it("get validations", async () => {

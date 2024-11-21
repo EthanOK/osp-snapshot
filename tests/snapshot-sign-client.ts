@@ -36,7 +36,7 @@ async function main() {
     {
       type: "space",
       action: "verify",
-      value: "ethan.osp",
+      value: "ethan.osp"
     },
     "osp"
   );

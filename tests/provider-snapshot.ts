@@ -1,6 +1,6 @@
 import {
   JsonRpcBatchProvider,
-  StaticJsonRpcProvider,
+  StaticJsonRpcProvider
 } from "@ethersproject/providers";
 import { ProviderOptions } from "@snapshot-labs/snapshot.js/dist/src/utils/provider";
 
@@ -16,7 +16,7 @@ function getProvider(
     {
       url,
       timeout: 25000,
-      allowGzip: true,
+      allowGzip: true
     },
     Number(network)
   );
@@ -33,7 +33,7 @@ async function main() {
   // https://eth-sepolia.g.alchemy.com/v2/cylP6mC72Z7Nv-k3FehuXverOVumN-j2
   const provider2 = getProvider("0", {
     broviderUrl:
-      "https://eth-sepolia.g.alchemy.com/v2/cylP6mC72Z7Nv-k3FehuXverOVumN-j2",
+      "https://eth-sepolia.g.alchemy.com/v2/cylP6mC72Z7Nv-k3FehuXverOVumN-j2"
   });
   console.log(await provider2.getBlockNumber());
 }

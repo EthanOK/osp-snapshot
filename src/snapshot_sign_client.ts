@@ -10,7 +10,7 @@ import { fetchRequest } from "./utils/util";
  */
 export enum FollowType {
   FOLLOW = "follow",
-  UNFOLLOW = "unfollow",
+  UNFOLLOW = "unfollow"
 }
 
 /**
@@ -64,7 +64,7 @@ export class SnapShotSignClient {
       snapshot.utils.validateSchema(snapshot.schemas.space, settings);
       const result = await this.signClient.space(web3, address, {
         space: spaceId,
-        settings: JSON.stringify(settings),
+        settings: JSON.stringify(settings)
       });
       console.log("result:", result);
       return result;
@@ -113,7 +113,7 @@ export class SnapShotSignClient {
     try {
       const result = await this.signClient.cancelProposal(web3, address, {
         space: spaceId,
-        proposal: proposalId,
+        proposal: proposalId
       });
       console.log("result:", result);
       return result;
@@ -159,7 +159,7 @@ export class SnapShotSignClient {
   ): Promise<any> {
     try {
       const result = await this.signClient.alias(web3, address, {
-        alias: alias,
+        alias: alias
       });
       console.log("result:", result);
       return result;
@@ -191,13 +191,13 @@ export class SnapShotSignClient {
         result = await this.signClient.unfollow(web3, address, {
           from: address,
           space: spaceId,
-          network: network == "s" ? "s" : "s-tn",
+          network: network == "s" ? "s" : "s-tn"
         });
       } else {
         result = await this.signClient.follow(web3, address, {
           from: address,
           space: spaceId,
-          network: network == "s" ? "s" : "s-tn",
+          network: network == "s" ? "s" : "s-tn"
         });
       }
 
@@ -246,9 +246,9 @@ export class SnapShotSignClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          secret: secret,
+          secret: secret
         },
-        body: JSON.stringify(params),
+        body: JSON.stringify(params)
       };
       const result = await fetchRequest(url, initParams);
       console.log("result:", result.success);

@@ -2,7 +2,7 @@ import {
   FollowType,
   getBlockNumber,
   SnapShotGraphQLClient,
-  SnapShotSignClient,
+  SnapShotSignClient
 } from "../src";
 import { expect } from "chai";
 import { Wallet } from "@ethersproject/wallet";
@@ -50,15 +50,15 @@ describe("Test SnapShot Sign Client", () => {
             symbol: "OKB",
             address: "0x3F4B6664338F23d2397c953f2AB4Ce8031663f80",
             network: "11155111",
-            decimals: 18,
-          },
-        },
+            decimals: 18
+          }
+        }
       ],
       validation: { name: "any", params: {} },
       voteValidation: { name: "any", params: {} },
       filters: { minScore: 0, onlyMembers: true },
       treasuries: [],
-      boost: { enabled: true, bribeEnabled: false },
+      boost: { enabled: true, bribeEnabled: false }
     };
 
     await signClient.signCreateOrUpdateSpace(
@@ -86,7 +86,7 @@ describe("Test SnapShot Sign Client", () => {
       snapshot: blockNumber,
       plugins: JSON.stringify({}),
       app: "ops_snapshot",
-      timestamp: timestamp,
+      timestamp: timestamp
     };
 
     const result = await signClient.signCreateProposal(
@@ -113,7 +113,7 @@ describe("Test SnapShot Sign Client", () => {
       type: "single-choice",
       choice: 3,
       app: "ops_snapshot",
-      reason: "like 3",
+      reason: "like 3"
     };
 
     await signClient.signCreateOrUpdateVote(
@@ -144,7 +144,7 @@ describe("Test SnapShot Sign Client", () => {
       {
         type: "space",
         action: "verify",
-        value: "ethan.osp",
+        value: "ethan.osp"
       },
       "osp"
     );

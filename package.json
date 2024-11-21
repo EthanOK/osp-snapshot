@@ -30,14 +30,25 @@
     "@types/mocha": "^10.0.9",
     "@types/node": "^22.9.0",
     "chai": "^4.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "mocha": "^10.8.2",
+    "prettier": "^3.3.3",
     "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
     "typedoc": "^0.26.11",
     "typescript": "^5.6.3"
   },
+  "lint-staged": {
+    "{src,tests}/**/*.{js,ts,tsx,json,css,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
   "scripts": {
+    "prepare": "husky install",
+    "prettier": "prettier --write \"{src,tests}/**/*.{js,ts,tsx,json,css,md}\"",
     "build": "tsup ./src/index.ts --format esm,cjs --dts",
     "typedoc": "typedoc src/index.ts",
     "test": "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/*.spec.ts"

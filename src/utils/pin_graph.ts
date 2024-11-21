@@ -1,7 +1,7 @@
 import { create } from "ipfs-http-client";
 
 const client = create({
-  url: "https://api.thegraph.com/ipfs/api/v0",
+  url: "https://api.thegraph.com/ipfs/api/v0"
 });
 
 export async function pinGraph(data: any) {
@@ -9,6 +9,6 @@ export async function pinGraph(data: any) {
 
   return {
     provider: "graph",
-    cid: res.cid.toV0().toString(),
+    cid: res.cid.toV0().toString()
   };
 }

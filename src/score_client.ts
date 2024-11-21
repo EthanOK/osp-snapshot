@@ -21,7 +21,7 @@ export class ScoreClient {
    */
   constructor(url: string, apiKey?: string) {
     this.options = {
-      url: `${url}?${apiKey ? `apiKey=${apiKey}` : ""}`,
+      url: `${url}?${apiKey ? `apiKey=${apiKey}` : ""}`
     };
     this.url = url;
     this.apiKey = apiKey;
@@ -120,7 +120,7 @@ export class ScoreClient {
     return result;
   }
 
-  async getValidations(){
+  async getValidations() {
     const url = `${this.url}/api/validations?${
       this.apiKey ? `apiKey=${this.apiKey}` : ""
     }`;
