@@ -1,6 +1,6 @@
 import { Proposal, Vote } from "@snapshot-labs/snapshot.js/src/sign/types";
 import { Wallet } from "@ethersproject/wallet";
-import { FollowType, SnapShotSignClient } from "../src";
+import { FollowType, pinGraph, SnapShotSignClient } from "../src";
 
 const web3Provider = new Wallet(
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
@@ -40,6 +40,8 @@ async function main() {
     },
     "osp"
   );
+  const ipfs = await pinGraph({ hello: "world" });
+  console.log(ipfs.cid);
 }
 
 main();
