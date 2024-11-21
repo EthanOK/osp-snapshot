@@ -7,33 +7,23 @@ async function main() {
   const scoreClient = new ScoreClient(score_URL, "osp_snapshot_apiKey");
 
   try {
-    const spaces = await queryClient.queryFollowSpace(
-      "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2"
-    );
-    console.log(spaces);
     const proposal = await queryClient.queryProposal(
-      "0xcb3b86050bf255ba88893c633ee80f6abbf3dae30e49705f03edffcb6819c312"
+      "0x214288542f501685317f4d4cfb8c17f3ff84b52c4e1766096736e12251ab3613"
     );
-    const vp = await scoreClient.getVotingPower(
-      "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2",
-      proposal.network,
-      proposal.strategies,
-      proposal.snapshot,
-      proposal.space
-    );
-    console.log(vp);
+    console.log(proposal);
 
-    const scores = await scoreClient.getScores(
-      [
-        "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2",
-        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      ],
-      proposal.network,
+    const account = "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2";
+
+    const validate = await scoreClient.validate(
+      proposal.validation.name,
+      proposal.validation.params,
       proposal.strategies,
+      account,
+      proposal.network,
       proposal.snapshot,
-      proposal.space
+      proposal.space.id
     );
-    console.log(scores);
+    console.log("validate", validate);
   } catch (error) {
     console.log(error);
   }

@@ -138,4 +138,15 @@ describe("Test SnapShot Sign Client", () => {
     const result = await signClient.refreshProposalScores(proposalId_);
     expect(result).to.be.true;
   });
+
+  it("Flag Operation", async () => {
+    await signClient.flagOperation(
+      {
+        type: "space",
+        action: "verify",
+        value: "ethan.osp",
+      },
+      "osp"
+    );
+  });
 });

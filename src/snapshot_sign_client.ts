@@ -3,6 +3,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import { Proposal, Vote } from "@snapshot-labs/snapshot.js/src/sign/types";
 import Client from "@snapshot-labs/snapshot.js/dist/src/sign";
+import { fetchRequest } from "./utils/util";
 
 /**
  * Follow type
@@ -215,13 +216,10 @@ export class SnapShotSignClient {
    */
   async refreshProposalScores(proposalId: string): Promise<boolean> {
     try {
-      const response = await fetch(
-        `${this.sequencerUrl}/scores/${proposalId}?${
-          this.apiKey ? `apiKey=${this.apiKey}` : ""
-        }`
-      );
-
-      const result: any = await response.json();
+      const url = `${this.sequencerUrl}/scores/${proposalId}?${
+        this.apiKey ? `apiKey=${this.apiKey}` : ""
+      }`;
+      const result = await fetchRequest(url);
       console.log("result:", result.result);
       return result.result as boolean;
     } catch (error) {
@@ -231,7 +229,7 @@ export class SnapShotSignClient {
   }
 
   /**
-   * Flag operation (flag, unflag, verify, hibernate, reactivate) 
+   * Flag operation (flag, unflag, verify, hibernate, reactivate)
    * @param params
    * @param secret
    * @returns
@@ -241,21 +239,18 @@ export class SnapShotSignClient {
     secret: string
   ): Promise<boolean> {
     try {
-      const response = await fetch(
-        `${this.sequencerUrl}/flag?${
-          this.apiKey ? `apiKey=${this.apiKey}` : ""
-        }`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            secret: secret,
-          },
-          body: JSON.stringify(params),
-        }
-      );
-
-      const result: any = await response.json();
+      const url = `${this.sequencerUrl}/flag?${
+        this.apiKey ? `apiKey=${this.apiKey}` : ""
+      }`;
+      const initParams: RequestInit = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          secret: secret,
+        },
+        body: JSON.stringify(params),
+      };
+      const result = await fetchRequest(url, initParams);
       console.log("result:", result.success);
       return result.success as boolean;
     } catch (error) {
