@@ -14,10 +14,25 @@ export enum FollowType {
 }
 
 /**
+ * Sign response result
+ * @param id string
+ * @param ipfs string
+ * @param relayer { address: string; receipt: string }
+ */
+export interface Message {
+  id: string;
+  ipfs: string;
+  relayer: {
+    address: string;
+    receipt: string;
+  };
+}
+
+/**
  * Flag operation params
  * @param type "space" | "proposal"
  * @param action "flag" | "unflag" | "verify" | "hibernate" | "reactivate"
- * @param value string
+ * @param value id
  */
 export interface FlagOperationParams {
   type: "space" | "proposal";
@@ -59,15 +74,14 @@ export class SnapShotSignClient {
     address: string,
     spaceId: string,
     settings: any
-  ) {
+  ): Promise<Message> {
     try {
       snapshot.utils.validateSchema(snapshot.schemas.space, settings);
       const result = await this.signClient.space(web3, address, {
         space: spaceId,
         settings: JSON.stringify(settings)
       });
-      console.log("result:", result);
-      return result;
+      return result as Message;
     } catch (error) {
       console.log("error:", error);
       return null;
@@ -85,11 +99,10 @@ export class SnapShotSignClient {
     web3: Web3Provider | Wallet,
     address: string,
     message: Proposal
-  ): Promise<any> {
+  ): Promise<Message> {
     try {
       const result = await this.signClient.proposal(web3, address, message);
-      console.log("result:", result);
-      return result;
+      return result as Message;
     } catch (error) {
       console.log("error:", error);
       return null;
@@ -109,14 +122,13 @@ export class SnapShotSignClient {
     address: string,
     spaceId: string,
     proposalId: string
-  ): Promise<any> {
+  ): Promise<Message> {
     try {
       const result = await this.signClient.cancelProposal(web3, address, {
         space: spaceId,
         proposal: proposalId
       });
-      console.log("result:", result);
-      return result;
+      return result as Message;
     } catch (error) {
       console.log("error:", error);
       return null;
@@ -134,11 +146,10 @@ export class SnapShotSignClient {
     web3: Web3Provider | Wallet,
     address: string,
     message: Vote
-  ): Promise<any> {
+  ): Promise<Message> {
     try {
       const result = await this.signClient.vote(web3, address, message);
-      console.log("result:", result);
-      return result;
+      return result as Message;
     } catch (error) {
       console.log("error:", error);
       return null;
@@ -156,13 +167,12 @@ export class SnapShotSignClient {
     web3: Web3Provider | Wallet,
     address: string,
     alias: string
-  ): Promise<any> {
+  ): Promise<Message> {
     try {
       const result = await this.signClient.alias(web3, address, {
         alias: alias
       });
-      console.log("result:", result);
-      return result;
+      return result as Message;
     } catch (error) {
       console.log("error:", error);
       return null;
@@ -170,7 +180,7 @@ export class SnapShotSignClient {
   }
 
   /**
-   *
+   * Sign follow space
    * @param web3
    * @param address
    * @param spaceId
@@ -184,7 +194,7 @@ export class SnapShotSignClient {
     spaceId: string,
     type: FollowType,
     network = "s"
-  ): Promise<any> {
+  ): Promise<Message> {
     try {
       let result: any;
       if (type === FollowType.UNFOLLOW) {
@@ -200,19 +210,18 @@ export class SnapShotSignClient {
           network: network == "s" ? "s" : "s-tn"
         });
       }
-
-      console.log("result:", result);
-      return result;
+      return result as Message;
     } catch (error) {
       console.log("error:", error);
+      return null;
     }
   }
 
   /**
    * Refresh proposal scores
-   * When the proposal.scores_state is pending, proposal.state is closed
+   * (When the proposal.scores_state is pending, proposal.state is closed)
    * @param proposalId
-   * @returns
+   * @returns boolean
    */
   async refreshProposalScores(proposalId: string): Promise<boolean> {
     try {
@@ -220,7 +229,6 @@ export class SnapShotSignClient {
         this.apiKey ? `apiKey=${this.apiKey}` : ""
       }`;
       const result = await fetchRequest(url);
-      console.log("result:", result.result);
       return result.result as boolean;
     } catch (error) {
       console.log("error:", error);
@@ -232,7 +240,7 @@ export class SnapShotSignClient {
    * Flag operation (flag, unflag, verify, hibernate, reactivate)
    * @param params
    * @param secret
-   * @returns
+   * @returns boolean
    */
   async flagOperation(
     params: FlagOperationParams,
@@ -251,7 +259,6 @@ export class SnapShotSignClient {
         body: JSON.stringify(params)
       };
       const result = await fetchRequest(url, initParams);
-      console.log("result:", result.success);
       return result.success as boolean;
     } catch (error) {
       console.log("error:", error);

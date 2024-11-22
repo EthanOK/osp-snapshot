@@ -1,17 +1,18 @@
 import {
   FollowType,
   getBlockNumber,
+  ProposalState,
   SnapShotGraphQLClient,
   SnapShotSignClient
 } from "../src";
-import { expect } from "chai";
+import { assert, expect } from "chai";
 import { Wallet } from "@ethersproject/wallet";
 import { Proposal, Vote } from "@snapshot-labs/snapshot.js/src/sign/types";
+import dotenv from "dotenv";
+dotenv.config();
 
 describe("Test SnapShot Sign Client", () => {
-  const web3Provider = new Wallet(
-    "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-  );
+  const web3Provider = new Wallet(process.env.PRIVATE_KEY_SIGNATURE!);
   const account = web3Provider.address;
 
   const sequencerUrl = "http://localhost:3001";
@@ -61,12 +62,13 @@ describe("Test SnapShot Sign Client", () => {
       boost: { enabled: true, bribeEnabled: false }
     };
 
-    await signClient.signCreateOrUpdateSpace(
+    const message = await signClient.signCreateOrUpdateSpace(
       web3Provider,
       account,
       spaceId_,
       settings_json
     );
+    expect(message).to.be.not.null;
   });
 
   it("CreateProposal", async () => {
@@ -89,22 +91,34 @@ describe("Test SnapShot Sign Client", () => {
       timestamp: timestamp
     };
 
-    const result = await signClient.signCreateProposal(
+    const message = await signClient.signCreateProposal(
       web3Provider,
       account,
       proposal_message
     );
-    proposalId_ = result.id;
+    proposalId_ = message.id;
+    global.proposalId = message.id;
+    expect(message).to.be.not.null;
   });
 
-  //   it("DeleteProposal", async () => {
-  //     const result = await signClient.signDeleteProposal(
-  //       web3Provider,
-  //       account,
-  //       spaceId,
-  //       proposalId
-  //     );
-  //   });
+  it("DeleteProposal", async () => {
+    const prroposals = await queryClient.queryProposals({
+      spaceIds: [spaceId_],
+      state: ProposalState.CLOSED
+    });
+    if (prroposals.length == 0) {
+      return;
+    }
+    for (let i = 0; i < Math.floor(prroposals.length / 2); i++) {
+      const message = await signClient.signDeleteProposal(
+        web3Provider,
+        account,
+        spaceId_,
+        prroposals[i].id
+      );
+      expect(message).to.be.not.null;
+    }
+  });
 
   it("VoteProposal", async () => {
     const vote_message: Vote = {
@@ -116,22 +130,24 @@ describe("Test SnapShot Sign Client", () => {
       reason: "like 3"
     };
 
-    await signClient.signCreateOrUpdateVote(
+    const message = await signClient.signCreateOrUpdateVote(
       web3Provider,
       account,
       vote_message
     );
+    expect(message).to.be.not.null;
   });
 
   it("FollowSpace", async () => {
     const follow_data = await queryClient.queryFollowSpace(account, spaceId_);
     const isFollow = follow_data.length > 0;
-    const result = await signClient.signFollowSpace(
+    const message = await signClient.signFollowSpace(
       web3Provider,
       account,
       spaceId_,
       isFollow ? FollowType.UNFOLLOW : FollowType.FOLLOW
     );
+    expect(message).to.be.not.null;
   });
 
   it("Refresh Proposal Scores", async () => {
@@ -140,7 +156,7 @@ describe("Test SnapShot Sign Client", () => {
   });
 
   it("Flag Operation", async () => {
-    await signClient.flagOperation(
+    const result = await signClient.flagOperation(
       {
         type: "space",
         action: "verify",
@@ -148,5 +164,6 @@ describe("Test SnapShot Sign Client", () => {
       },
       "osp"
     );
+    expect(result).to.be.true;
   });
 });

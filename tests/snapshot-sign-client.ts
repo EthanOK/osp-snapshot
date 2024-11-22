@@ -2,11 +2,10 @@ import { Proposal, Vote } from "@snapshot-labs/snapshot.js/src/sign/types";
 import { Wallet } from "@ethersproject/wallet";
 import { FollowType, pinGraph, SnapShotSignClient } from "../src";
 
-const web3Provider = new Wallet(
-  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-);
+const web3Provider = new Wallet(process.env.PRIVATE_KEY_SIGNATURE!);
 const account = web3Provider.address;
 console.log(account);
+console.log(web3Provider.provider);
 
 async function main() {
   const sequencerUrl = "http://localhost:3001";

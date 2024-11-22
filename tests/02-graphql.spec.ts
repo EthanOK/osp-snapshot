@@ -1,5 +1,7 @@
 import { ProposalState, SnapShotGraphQLClient } from "../src";
 import { expect } from "chai";
+import dotenv from "dotenv";
+dotenv.config();
 
 describe("Test SnapShot GraphQL Client", () => {
   const hub_URL = "http://localhost:3000";
@@ -74,7 +76,7 @@ describe("Test SnapShot GraphQL Client", () => {
     const data = await queryClient.queryFollowSpace(voter_);
     console.log(data);
     for (const item of data) {
-      console.log("follow space:", item.space);
+      console.log("follow space:", item.space.id);
     }
   });
 });

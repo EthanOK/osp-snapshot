@@ -65,6 +65,54 @@ export interface QueryVotesParam {
   voter?: string;
 }
 
+export interface Proposal {
+  id: string;
+  ipfs?: string;
+  title: string;
+  body?: string;
+  discussion?: any;
+  choices: string[];
+  labels?: any;
+  start: number;
+  end: number;
+  snapshot: number;
+  state: string;
+  author: string;
+  created: number;
+  plugins?: any;
+  network: string;
+  type: string;
+  quorum?: number;
+  quorumType?: string;
+  symbol: string;
+  privacy?: string;
+  validation: {
+    name: string;
+    params?: any;
+  };
+  strategies: {
+    name: string;
+    network?: string;
+    params: any;
+  }[];
+  space: {
+    id: string;
+    name: string;
+    members?: string[];
+    avatar?: string;
+    symbol?: string;
+    verified?: boolean;
+    turbo?: boolean;
+    plugins?: any;
+  };
+  scores_state: string;
+  scores: number[];
+  scores_by_strategy: number[];
+  scores_total: number;
+  votes: number;
+  flagged?: boolean;
+}
+
 /**
  * GraphQL client
  */
@@ -153,7 +201,7 @@ export class SnapShotGraphQLClient {
    * @returns
    */
   async queryProposals(params: QueryProposalParam, skip = 0) {
-    return await this.apolloQuery(
+    return (await this.apolloQuery(
       {
         query: PROPOSALS_QUERY,
         variables: {
@@ -166,7 +214,7 @@ export class SnapShotGraphQLClient {
         }
       },
       "proposals"
-    );
+    )) as Proposal[];
   }
 
   /**
@@ -175,7 +223,7 @@ export class SnapShotGraphQLClient {
    * @returns
    */
   async queryProposal(proposalId: string) {
-    return await this.apolloQuery(
+    return (await this.apolloQuery(
       {
         query: PROPOSAL_QUERY,
         variables: {
@@ -183,7 +231,7 @@ export class SnapShotGraphQLClient {
         }
       },
       "proposal"
-    );
+    )) as Proposal;
   }
 
   /**
@@ -193,7 +241,7 @@ export class SnapShotGraphQLClient {
    * @returns
    */
   async queryVotesByProposalId(queryParams: QueryVotesParam, skip = 0) {
-    return await this.apolloQuery(
+    return (await this.apolloQuery(
       {
         query: VOTES_QUERY,
         variables: {
@@ -207,7 +255,15 @@ export class SnapShotGraphQLClient {
         }
       },
       "votes"
-    );
+    )) as {
+      ipfs: string;
+      voter: string;
+      choice: any;
+      vp: number;
+      vp_by_strategy: number[];
+      reason?: string;
+      created: number;
+    }[];
   }
 
   /**
@@ -218,7 +274,7 @@ export class SnapShotGraphQLClient {
    * @returns
    */
   async queryVotesByVoter(voter: string, first = 20, skip = 0) {
-    return await this.apolloQuery(
+    return (await this.apolloQuery(
       {
         query: ACTIVITY_VOTES_QUERY,
         variables: {
@@ -228,7 +284,21 @@ export class SnapShotGraphQLClient {
         }
       },
       "votes"
-    );
+    )) as {
+      id: string;
+      created: number;
+      choice: any;
+      proposal: {
+        id: string;
+        title: string;
+        choices: string[];
+        type: string;
+      };
+      space: {
+        id: string;
+        avatar?: string;
+      };
+    }[];
   }
 
   /**
@@ -258,7 +328,7 @@ export class SnapShotGraphQLClient {
    * @returns
    */
   async queryFollowSpace(account: string, spaceId?: string) {
-    return await this.apolloQuery(
+    return (await this.apolloQuery(
       {
         query: FOLLOWS_QUERY,
         variables: {
@@ -267,6 +337,12 @@ export class SnapShotGraphQLClient {
         }
       },
       "follows"
-    );
+    )) as {
+      id: string;
+      follower: string;
+      space: {
+        id: string;
+      };
+    }[];
   }
 }
