@@ -218,3 +218,38 @@ export async function claimTokens(
   const contract = new Contract(BOOST_CONTRACTS[networkId], ABI, signer);
   return await contract.claim([boostId, recipient, amount], signature);
 }
+
+/**
+ * Claim all tokens from a list of boosts
+ * @param web3Provider
+ * @param networkId
+ * @param boosts
+ * @param signatures
+ * @returns
+ */
+export async function claimAllTokens(
+  web3Provider: Web3Provider | Wallet,
+  networkId: string,
+  boosts: {
+    boostId: string;
+    recipient: string;
+    amount: string;
+  }[],
+  signatures: string[]
+): Promise<TransactionResponse> {
+  const boostsArray = boosts.map((boost) => [
+    boost.boostId,
+    boost.recipient,
+    boost.amount
+  ]);
+  let signer: any;
+  if (web3Provider instanceof Web3Provider) {
+    signer = web3Provider.getSigner();
+  } else {
+    if (web3Provider.provider == null)
+      signer = web3Provider.connect(getProvider(networkId));
+    else signer = web3Provider;
+  }
+  const contract = new Contract(BOOST_CONTRACTS[networkId], ABI, signer);
+  return await contract.claimMultiple(boostsArray, signatures);
+}
