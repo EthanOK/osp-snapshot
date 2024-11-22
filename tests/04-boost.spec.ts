@@ -22,7 +22,7 @@ const wallet = new Wallet(process.env.PRIVATE_KEY!).connect(
 //   "0x3b9dd063ca30e9d3416f94df1a04d16a235b3362a687a7a76fae0790474113b7";
 
 describe("Test Boost Client", () => {
-  const uri = "http://localhost:8090";
+  const uri = "http://127.0.0.1:8090";
   const boostGuardClient = new BoostGuardClient(uri);
   const hub_URL = "http://localhost:3000";
   const queryClient = new SnapShotGraphQLClient(hub_URL, "osp_snapshot_apiKey");
@@ -75,4 +75,65 @@ describe("Test Boost Client", () => {
     const boosts = await getBoosts([proposalId_]);
     console.log(boosts);
   });
+
+  it("Get Rewards from boost guard client", async () => {
+    const proposalId =
+      "0x2d7db45226a464e2e8a25d6e9edd09e861564b60f40c03c663539cab5a7d544d";
+    const voter = "0x6278a1e803a76796a3a1f7f6344fe874ebfe94b2";
+    const boosts = await getBoosts([proposalId]);
+    const boostRewards = await boostGuardClient.getRewards(
+      proposalId,
+      voter,
+      boosts
+    );
+    console.log("boostRewards", boostRewards);
+  }).timeout(10000);
+
+  it("Get Winners for lottery boost from boost guard client", async () => {
+    const proposalId =
+      "0x2d7db45226a464e2e8a25d6e9edd09e861564b60f40c03c663539cab5a7d544d";
+    const boosts = await getBoosts([proposalId]);
+    const lottery_boost = boosts.map((boost) => {
+      if (boost.strategy.distribution.type === "lottery") {
+        return {
+          boostId: boost.id,
+          chainId: boost.chainId
+        };
+      }
+    });
+    if (lottery_boost.length === 0) {
+      return;
+    }
+    for (const boost of lottery_boost) {
+      const winners = await boostGuardClient.getWinners(
+        proposalId,
+        boost.boostId,
+        boost.chainId
+      );
+      console.log(winners);
+    }
+  }).timeout(10000);
+
+  it("Get Vouchers from boost guard client", async () => {
+    const proposalId =
+      "0x2d7db45226a464e2e8a25d6e9edd09e861564b60f40c03c663539cab5a7d544d";
+    const voter = "0x6278a1e803a76796a3a1f7f6344fe874ebfe94b2";
+
+    const boosts = await getBoosts([proposalId]);
+    const boostRewards = await boostGuardClient.getRewards(
+      proposalId,
+      voter,
+      boosts
+    );
+    const boost_ids = boostRewards.map((reward) => reward.boost_id);
+    const vouchers_boost = boosts.map((boost) => {
+      if (boost_ids.includes(boost.id)) return boost;
+    });
+    const vouchers = await boostGuardClient.getVouchers(
+      proposalId,
+      voter,
+      vouchers_boost
+    );
+    console.log("Vouchers:", vouchers);
+  }).timeout(10000);
 });

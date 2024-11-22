@@ -35,7 +35,9 @@ export const BOOST_CONTRACTS = {
 export const SUPPORTED_NETWORKS = Object.keys(BOOST_CONTRACTS);
 
 export const TWO_WEEKS = 1209600;
-export async function getBoosts(proposalIds: string[]) {
+export async function getBoosts(
+  proposalIds: string[]
+): Promise<BoostSubgraph[]> {
   async function query(chainId: string) {
     const data = await snapshot.utils.subgraphRequest(SUBGRAPH_URLS[chainId], {
       boosts: {
@@ -187,6 +189,13 @@ export async function createBoost(
   );
 }
 
+/**
+ * Claim tokens from a boost
+ * @param web3Provider
+ * @param networkId
+ * @param boost
+ * @param signature
+ */
 export async function claimTokens(
   web3Provider: Web3Provider | Wallet,
   networkId: string,

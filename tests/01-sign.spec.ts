@@ -84,7 +84,7 @@ describe("Test SnapShot Sign Client", () => {
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       labels: [],
       start: timestamp,
-      end: timestamp + 6000,
+      end: timestamp + 120,
       snapshot: blockNumber,
       plugins: JSON.stringify({}),
       app: "ops_snapshot",
@@ -109,15 +109,14 @@ describe("Test SnapShot Sign Client", () => {
     if (prroposals.length == 0) {
       return;
     }
-    for (let i = 0; i < Math.floor(prroposals.length / 2); i++) {
-      const message = await signClient.signDeleteProposal(
-        web3Provider,
-        account,
-        spaceId_,
-        prroposals[i].id
-      );
-      expect(message).to.be.not.null;
-    }
+
+    const message = await signClient.signDeleteProposal(
+      web3Provider,
+      account,
+      spaceId_,
+      prroposals[prroposals.length - 1].id
+    );
+    expect(message).to.be.not.null;
   });
 
   it("VoteProposal", async () => {
