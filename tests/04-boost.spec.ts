@@ -1,9 +1,13 @@
 import {
   BoostGuardClient,
+  BoostVoucherGuard,
+  claimAllTokens,
+  claimTokens,
   createBoost,
   Distribution,
   Eligibility,
   getBoosts,
+  getClaims,
   getProvider,
   getStrategyURI,
   SnapShotGraphQLClient,
@@ -29,10 +33,14 @@ describe("Test Boost Client", () => {
 
   let strategyURI: string;
   let guardAddress: string;
+  let vouchers: BoostVoucherGuard[];
 
   it("Get Strategy URI from IFPS", async () => {
     // Read global.proposalId
     const proposalId_ = global.proposalId;
+    if (proposalId_ == undefined) {
+      return;
+    }
 
     const eligibility: Eligibility = {
       type: "incentive"
@@ -52,6 +60,9 @@ describe("Test Boost Client", () => {
 
   it("Create Boost On Chain", async () => {
     const proposalId_ = global.proposalId;
+    if (proposalId_ == undefined) {
+      return;
+    }
     const proposal = await queryClient.queryProposal(proposalId_);
     try {
       const createTx = await createBoost(wallet, "11155111", "0", {
@@ -91,7 +102,7 @@ describe("Test Boost Client", () => {
 
   it("Get Winners for lottery boost from boost guard client", async () => {
     const proposalId =
-      "0x2d7db45226a464e2e8a25d6e9edd09e861564b60f40c03c663539cab5a7d544d";
+      "0x38ffae8b566d660b10f60794fbe2592bd7b19abc8a1421059516c42f2f34d807";
     const boosts = await getBoosts([proposalId]);
     const lottery_boost = boosts.map((boost) => {
       if (boost.strategy.distribution.type === "lottery") {
@@ -116,7 +127,7 @@ describe("Test Boost Client", () => {
 
   it("Get Vouchers from boost guard client", async () => {
     const proposalId =
-      "0x2d7db45226a464e2e8a25d6e9edd09e861564b60f40c03c663539cab5a7d544d";
+      "0x38ffae8b566d660b10f60794fbe2592bd7b19abc8a1421059516c42f2f34d807";
     const voter = "0x6278a1e803a76796a3a1f7f6344fe874ebfe94b2";
 
     const boosts = await getBoosts([proposalId]);
@@ -125,15 +136,55 @@ describe("Test Boost Client", () => {
       voter,
       boosts
     );
-    const boost_ids = boostRewards.map((reward) => reward.boost_id);
-    const vouchers_boost = boosts.map((boost) => {
-      if (boost_ids.includes(boost.id)) return boost;
-    });
-    const vouchers = await boostGuardClient.getVouchers(
+    const claims = await getClaims(voter);
+    const claimed_boost_ids = new Set(claims.map((claim) => claim.boost.id));
+
+    const boost_ids = boostRewards
+      .filter((reward) => !claimed_boost_ids.has(reward.boost_id))
+      .map((reward) => reward.boost_id);
+
+    const vouchers_boost = boosts.filter((boost) =>
+      boost_ids.includes(boost.id)
+    );
+    vouchers = await boostGuardClient.getVouchers(
       proposalId,
       voter,
       vouchers_boost
     );
     console.log("Vouchers:", vouchers);
   }).timeout(10000);
+
+  it("Claim Vouchers on Chain", async () => {
+    if (vouchers.length == 0) return;
+
+    if (vouchers.length == 1) {
+      const claimTx = await claimTokens(
+        wallet,
+        vouchers[0].chain_id,
+        {
+          boostId: vouchers[0].boost_id,
+          amount: vouchers[0].reward,
+          recipient: wallet.address
+        },
+        vouchers[0].signature
+      );
+
+      const resp = await claimTx.wait();
+      console.log("transactionHash:", resp.transactionHash);
+    } else {
+      const claimTx = await claimAllTokens(
+        wallet,
+        vouchers[0].chain_id,
+        vouchers.map((v) => ({
+          boostId: v.boost_id,
+          amount: v.reward,
+          recipient: wallet.address
+        })),
+        vouchers.map((v) => v.signature)
+      );
+
+      const resp = await claimTx.wait();
+      console.log("transactionHash:", resp.transactionHash);
+    }
+  }).timeout(100000);
 });
