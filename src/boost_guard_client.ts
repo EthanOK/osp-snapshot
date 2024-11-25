@@ -21,7 +21,6 @@ export class BoostGuardClient {
       const result = await fetchRequest(this.GUARD_URL);
       return result.guard_address;
     } catch (error) {
-      console.log("error:", error);
       return null;
     }
   }
@@ -38,19 +37,23 @@ export class BoostGuardClient {
     voter: string,
     boosts: BoostSubgraph[]
   ): Promise<BoostRewardGuard[]> {
-    const init: RequestInit = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        proposal_id: proposalId,
-        voter_address: voter,
-        boosts: boosts.map((boost) => [boost.id, boost.chainId])
-      })
-    };
-    const result = await fetchRequest(`${this.GUARD_URL}/get-rewards`, init);
-    return result;
+    try {
+      const init: RequestInit = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          proposal_id: proposalId,
+          voter_address: voter,
+          boosts: boosts.map((boost) => [boost.id, boost.chainId])
+        })
+      };
+      const result = await fetchRequest(`${this.GUARD_URL}/get-rewards`, init);
+      return result;
+    } catch (error) {
+      return [];
+    }
   }
 
   /**
@@ -65,22 +68,26 @@ export class BoostGuardClient {
     boostId: string,
     chainId: string
   ): Promise<BoostWinnersGuard> {
-    const init: RequestInit = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        proposal_id: proposalId,
-        boost_id: boostId,
-        chain_id: chainId
-      })
-    };
-    const result = await fetchRequest(
-      `${this.GUARD_URL}/get-lottery-winners`,
-      init
-    );
-    return result;
+    try {
+      const init: RequestInit = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          proposal_id: proposalId,
+          boost_id: boostId,
+          chain_id: chainId
+        })
+      };
+      const result = await fetchRequest(
+        `${this.GUARD_URL}/get-lottery-winners`,
+        init
+      );
+      return result;
+    } catch (error) {
+      return null;
+    }
   }
 
   /**
@@ -95,22 +102,26 @@ export class BoostGuardClient {
     voter: string,
     boosts: BoostSubgraph[]
   ): Promise<BoostVoucherGuard[]> {
-    const init: RequestInit = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        proposal_id: proposalId,
-        voter_address: voter,
-        boosts: boosts.map((boost) => [boost.id, boost.chainId])
-      })
-    };
-    const result = await fetchRequest(
-      `${this.GUARD_URL}/create-vouchers`,
-      init
-    );
+    try {
+      const init: RequestInit = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          proposal_id: proposalId,
+          voter_address: voter,
+          boosts: boosts.map((boost) => [boost.id, boost.chainId])
+        })
+      };
+      const result = await fetchRequest(
+        `${this.GUARD_URL}/create-vouchers`,
+        init
+      );
 
-    return result;
+      return result;
+    } catch (error) {
+      return [];
+    }
   }
 }

@@ -161,7 +161,11 @@ export async function getStrategyURI(
         return null;
       }
       break;
-
+    case "weighted":
+      if (distribution.limit !== null && Number(distribution.limit) <= 0) {
+        console.error("Max reward need greater than 0");
+        return null;
+      }
     default:
       break;
   }
