@@ -1,5 +1,12 @@
 import snapshot from "@snapshot-labs/snapshot.js";
 import { fetchRequest } from "./utils/util";
+import {
+  SpaceStrategy,
+  SpaceValidation,
+  VoteValidation
+} from "./utils/interfaces";
+
+export type ProposalValidation = SpaceValidation;
 
 export interface Strategy {
   name: string;
@@ -81,9 +88,45 @@ export class ScoreClient {
   }
 
   /**
-   * Validate voting power
-   * @param validationName
-   * @param validationParams
+   * Proposal validation
+   * @param validation
+   * @param strategies
+   * @param account
+   * @param network
+   * @param space
+   * @returns
+   */
+  async proposalValidate(
+    validation: ProposalValidation,
+    strategies: SpaceStrategy[],
+    account: string,
+    network: string,
+    space = "spaceId"
+  ): Promise<boolean> {
+    if (validation.name === "basic") {
+      validation.params.minScore = validation.params?.minScore || 0;
+      validation.params.strategies =
+        validation?.params?.strategies || strategies;
+    }
+    const validateRes = await snapshot.utils.validate(
+      validation.name,
+      account,
+      space,
+      network,
+      "latest",
+      validation.params,
+      this.options
+    );
+    if (typeof validateRes !== "boolean") {
+      console.error("Vote validation failed", validateRes);
+      return false;
+    }
+    return validateRes;
+  }
+
+  /**
+   * Vote validation
+   * @param validation
    * @param strategies
    * @param account
    * @param network
@@ -91,25 +134,29 @@ export class ScoreClient {
    * @param space
    * @returns
    */
-  async validate(
-    validationName: string,
-    validationParams: any,
-    strategies: any[],
+  async voteValidate(
+    validation: VoteValidation,
+    strategies: SpaceStrategy[],
     account: string,
     network: string,
     snapshot_: number | "latest",
     space = "spaceId"
   ): Promise<boolean> {
-    if (validationName == "basic") validationParams.strategies = strategies;
-    return await snapshot.utils.validate(
-      validationName,
+    if (validation.name == "basic") validation.params.strategies = strategies;
+    const validateRes = await snapshot.utils.validate(
+      validation.name,
       account,
       space,
       network,
       snapshot_,
-      validationParams,
+      validation.params,
       this.options
     );
+    if (typeof validateRes !== "boolean") {
+      console.error("Vote validation failed", validateRes);
+      return false;
+    }
+    return validateRes;
   }
 
   async getStrategies() {

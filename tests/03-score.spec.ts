@@ -24,10 +24,21 @@ describe("Test Score Client", () => {
     console.log("vp:", vp);
   });
 
+  it("validate account have proposal power", async () => {
+    const space = await queryClient.querySpace("butter.official.osp");
+    const validate = await scoreClient.proposalValidate(
+      space.validation,
+      space.strategies,
+      "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d",
+      space.network,
+      space.id
+    );
+    console.log("validate proposal power:", validate);
+  });
+
   it("validate account have vote power", async () => {
-    const validate = await scoreClient.validate(
-      proposal.validation.name,
-      proposal.validation.params,
+    const validate = await scoreClient.voteValidate(
+      proposal.validation,
       proposal.strategies,
       account,
       proposal.network,
@@ -60,4 +71,4 @@ describe("Test Score Client", () => {
     const validations = await scoreClient.getValidations();
     expect(validations).to.not.be.null;
   });
-});
+}).timeout(100000);

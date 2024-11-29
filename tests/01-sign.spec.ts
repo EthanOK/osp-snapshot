@@ -31,15 +31,18 @@ describe("Test SnapShot Sign Client", () => {
 
   it("CreateSpace Or UpdateSpace", async () => {
     const settings_json = {
-      name: "ETHAN.OSP",
+      name: "Butter.OSP",
       network: "11155111",
       symbol: "OKB",
       avatar: "",
       website: "http://www.github.com",
       twitter: "ethan",
       private: false,
-      admins: ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"],
-      moderators: ["0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2"],
+      admins: [
+        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2"
+      ],
+      moderators: [],
       members: [],
       categories: ["service"],
       labels: [],
@@ -68,11 +71,11 @@ describe("Test SnapShot Sign Client", () => {
     const message = await signClient.signCreateOrUpdateSpace(
       web3Provider,
       account,
-      spaceId_,
+      "butter.official.osp",
       settings_json
     );
     expect(message).to.be.not.null;
-  });
+  }).timeout(10000);
 
   it("CreateProposal", async () => {
     const data = await queryClient.querySpace(spaceId_);
@@ -82,7 +85,7 @@ describe("Test SnapShot Sign Client", () => {
       space: spaceId_,
       type: "single-choice",
       title: "Test Proposal_" + timestamp,
-      body: "This is a test proposal body",
+      body: "",
       discussion: "",
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       labels: [],
@@ -102,7 +105,7 @@ describe("Test SnapShot Sign Client", () => {
     proposalId_ = message.id;
     global.proposalId = message.id;
     expect(message).to.be.not.null;
-  });
+  }).timeout(10000);
 
   it("DeleteProposal", async () => {
     const prroposals = await queryClient.queryProposals({

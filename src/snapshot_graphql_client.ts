@@ -15,6 +15,7 @@ import {
   SPACES_RANKING_QUERY,
   VOTES_QUERY
 } from "./utils/queries";
+import { ExtendedSpace, Proposal } from "./utils/interfaces";
 
 export enum ProposalState {
   ALL = "all",
@@ -63,54 +64,6 @@ export interface QueryVotesParam {
   orderDirection?: "asc" | "desc";
   onlyWithReason?: string;
   voter?: string;
-}
-
-export interface Proposal {
-  id: string;
-  ipfs?: string;
-  title: string;
-  body?: string;
-  discussion?: any;
-  choices: string[];
-  labels?: any;
-  start: number;
-  end: number;
-  snapshot: number;
-  state: string;
-  author: string;
-  created: number;
-  plugins?: any;
-  network: string;
-  type: string;
-  quorum?: number;
-  quorumType?: string;
-  symbol: string;
-  privacy?: string;
-  validation: {
-    name: string;
-    params?: any;
-  };
-  strategies: {
-    name: string;
-    network?: string;
-    params: any;
-  }[];
-  space: {
-    id: string;
-    name: string;
-    members?: string[];
-    avatar?: string;
-    symbol?: string;
-    verified?: boolean;
-    turbo?: boolean;
-    plugins?: any;
-  };
-  scores_state: string;
-  scores: number[];
-  scores_by_strategy: number[];
-  scores_total: number;
-  votes: number;
-  flagged?: boolean;
 }
 
 /**
@@ -182,7 +135,7 @@ export class SnapShotGraphQLClient {
    * @param spaceId
    * @returns
    */
-  async querySpace(spaceId: string) {
+  async querySpace(spaceId: string): Promise<ExtendedSpace> {
     return await this.apolloQuery(
       {
         query: SPACE_QUERY,

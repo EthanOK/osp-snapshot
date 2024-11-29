@@ -6,3 +6,4 @@ export * from "./utils/pin_graph";
 export * from "./boost";
 export * from "./boost_guard_client";
 export * from "./utils/boost_types";
+export * from "./utils/interfaces";
