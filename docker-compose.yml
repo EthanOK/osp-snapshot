@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+
+  # Snapshot hub
+  snapshot-hub:
+    build: .
+    container_name: snapshot-hub
+    env_file:
+      - .env
+    # environment:
+      # HUB_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
+      # SEQ_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
+
+    ports:
+      - "3000:3000"
+
+networks:
+  default:
+    name: snapshot-network
