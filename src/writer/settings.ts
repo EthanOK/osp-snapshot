@@ -5,6 +5,7 @@ import { addOrUpdateSpace, getSpace } from '../helpers/actions';
 import log from '../helpers/log';
 import db from '../helpers/mysql';
 import { clearStampCache, DEFAULT_NETWORK, jsonParse } from '../helpers/utils';
+import { validateOspHandle } from '../osp';
 
 const SNAPSHOT_ENV = process.env.NETWORK || 'testnet';
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
@@ -73,10 +74,8 @@ export async function verify(body): Promise<any> {
     return Promise.reject(e);
   }
 
-  const controller = await snapshot.utils.getSpaceController(msg.space, DEFAULT_NETWORK, {
-    broviderUrl
-  });
-  const isController = controller === body.address;
+  // TODO: validate Osp Handle 
+  const isController = await validateOspHandle(body.address, space.id, space.network);
 
   const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());

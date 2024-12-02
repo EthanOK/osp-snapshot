@@ -11,6 +11,20 @@ export default rateLimit({
   keyGenerator: req => hashedIp(req),
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req, res) => {
+    if (!redisClient?.isReady) return true;
+
+    // TODO: rate limited
+    const apiKey: any = req.headers['x-api-key'] || req.query.apiKey;
+    console.log('apiKey:', apiKey);
+    let whiteList = ['https://snapshot.osp.org'];
+    let apiKeyList = ['osp_snapshot_apiKey'];
+    const origin = req.headers['origin'];
+    if (origin && whiteList.includes(origin)) return true;
+    if (apiKey && apiKeyList.includes(apiKey)) return true;
+
+    return false;
+  },
   handler: (req, res) => {
     sendError(
       res,
@@ -18,7 +32,6 @@ export default rateLimit({
       429
     );
   },
-  skip: () => !redisClient?.isReady,
   store: redisClient
     ? new RedisStore({
         sendCommand: (...args: string[]) => redisClient.sendCommand(args),

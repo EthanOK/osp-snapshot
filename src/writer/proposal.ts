@@ -10,6 +10,7 @@ import { containsFlaggedLinks, flaggedAddresses } from '../helpers/moderation';
 import { isMalicious } from '../helpers/monitoring';
 import db from '../helpers/mysql';
 import { captureError, getQuorum, jsonParse, validateChoices } from '../helpers/utils';
+import { getOspAccounts } from '../osp';
 
 const scoreAPIUrl = process.env.SCORE_API_URL || 'https://score.snapshot.org';
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
@@ -66,6 +67,11 @@ export async function verify(body): Promise<any> {
   }
 
   space.id = msg.space;
+  // TODO: add choices maxLength
+  snapshot.schemas.proposal.properties.choices.maxLengthWithSpaceType = {
+    default: 2000,
+    turbo: 5000
+  };
 
   const schemaIsValid = snapshot.utils.validateSchema(snapshot.schemas.proposal, msg.payload, {
     spaceType: space.turbo ? 'turbo' : 'default'
@@ -142,10 +148,13 @@ export async function verify(body): Promise<any> {
           validationParams.minScore = minScore;
           validationParams.strategies = space.validation?.params?.strategies || space.strategies;
         }
+        // TODO: get osp Accounts By web3auth account
+        const accounts = await getOspAccounts(body.address, space.network);
+        console.log('accounts:', accounts);
 
         isValid = await snapshot.utils.validate(
           validationName,
-          body.address,
+          accounts?.abstractAccount || body.address,
           space.id,
           space.network,
           'latest',
@@ -178,7 +187,8 @@ export async function verify(body): Promise<any> {
       return Promise.reject('invalid snapshot block');
     return Promise.reject('unable to fetch block');
   }
-
+  // TODO: Remove user proposal limit
+  return;
   try {
     const [{ dayCount, monthCount, activeProposalsByAuthor }] = await getProposalsCount(
       space.id,

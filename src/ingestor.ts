@@ -246,6 +246,7 @@ export default async function ingestor(req) {
         hash: id,
         ...restBody
       };
+      // TODO: pin to IPFS
       [pinned, receipt] = await Promise.all([
         pin(ipfsBody, process.env.PINEAPPLE_URL),
         issueReceipt(formattedSignature)

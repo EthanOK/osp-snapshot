@@ -5,6 +5,7 @@ import log from '../helpers/log';
 import db from '../helpers/mysql';
 import { captureError, hasStrategyOverride, jsonParse } from '../helpers/utils';
 import { updateProposalAndVotes } from '../scores';
+import { getOspAccounts } from '../osp';
 
 const scoreAPIUrl = process.env.SCORE_API_URL || 'https://score.snapshot.org';
 
@@ -45,6 +46,10 @@ export async function verify(body): Promise<any> {
     if (!snapshot.utils.voting[proposal.type].isValidChoice(msg.payload.choice, proposal.choices))
       return Promise.reject('invalid choice');
   }
+  
+  // TODO: get osp Accounts By web3auth account
+  const accounts = await getOspAccounts(body.address, proposal.network);
+  console.log('accounts:', accounts);
 
   if (proposal.validation?.name && proposal.validation.name !== 'any') {
     try {
@@ -56,7 +61,7 @@ export async function verify(body): Promise<any> {
 
       const validate = await snapshot.utils.validate(
         validationName,
-        body.address,
+        accounts?.abstractAccount || body.address,
         msg.space,
         proposal.network,
         proposal.snapshot,
@@ -78,7 +83,7 @@ export async function verify(body): Promise<any> {
   let vp: any = {};
   try {
     vp = await snapshot.utils.getVp(
-      body.address,
+      accounts?.bindEOA || body.address,
       proposal.network,
       proposal.strategies,
       proposal.snapshot,

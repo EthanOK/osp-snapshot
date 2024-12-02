@@ -10,6 +10,7 @@ services:
     environment:
       NETWORK: mainnet
       RATE_LIMIT_DATABASE_URL: redis://redis:6379
+      # SCORE_API_URL: https://score.snapshot.org
 
     ports:
       - '3001:3001'  
