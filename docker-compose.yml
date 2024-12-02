@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+
+  # Snapshot hub
+  snapshot-hub:
+    build: .
+    container_name: snapshot-sequencer
+    env_file:
+      - .env
+    environment:
+      NETWORK: mainnet
+      RATE_LIMIT_DATABASE_URL: redis://redis:6379
+
+    ports:
+      - '3001:3001'  
+  
+networks:
+  default:
+    name: snapshot-network
