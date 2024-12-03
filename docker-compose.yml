@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+
+  # Snapshot webhook
+  snapshot-webhook:
+    build: .
+    container_name: snapshot-webhook
+    env_file:
+      - .env
+    environment:
+      SERVICE_EVENTS: 1
+      HUB_URL: http://host.docker.internal:3000
+
+    ports:
+      - '3002:3002'  
+  
+networks:
+  default:
+    external: true
+    name: snapshot-network
