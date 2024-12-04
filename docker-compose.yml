@@ -9,8 +9,10 @@ services:
       - .env
     environment:
       RATE_LIMIT_DATABASE_URL: redis://redis:6379
-      # HUB_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
-      # SEQ_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
+      # HUB_DATABASE_URL: mysql://root:pwd@rm-.mysql.singapore.rds.aliyuncs.com:3306/snapshot
+      # SEQ_DATABASE_URL: mysql://root:pwd@rm-.mysql.singapore.rds.aliyuncs.com:3306/snapshot
+      SEQUENCER_URL: http://localhost:3001
+      # SCORE_API_URL: https://score.snapshot.org
 
     ports:
       - "3000:3000"
