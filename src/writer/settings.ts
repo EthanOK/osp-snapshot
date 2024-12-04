@@ -74,8 +74,8 @@ export async function verify(body): Promise<any> {
     return Promise.reject(e);
   }
 
-  // TODO: validate Osp Handle 
-  const isController = await validateOspHandle(body.address, space.id, space.network);
+  // TODO: validate Osp Handle
+  const isController = await validateOspHandle(body.address, msg.space, msg.payload.network);
 
   const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());
