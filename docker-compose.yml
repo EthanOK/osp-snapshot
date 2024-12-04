@@ -10,7 +10,10 @@ services:
     environment:
       NETWORK: mainnet
       RATE_LIMIT_DATABASE_URL: redis://redis:6379
+      # HUB_DATABASE_URL: mysql://root:pwd@rm-.mysql.singapore.rds.aliyuncs.com:3306/snapshot
+      # SEQ_DATABASE_URL: mysql://root:pwd@rm-.mysql.singapore.rds.aliyuncs.com:3306/snapshot
       # SCORE_API_URL: https://score.snapshot.org
+      # BROVIDER_URL: https://rpc.snapshot.org
 
     ports:
       - '3001:3001'  
