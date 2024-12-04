@@ -7,7 +7,8 @@ services:
     container_name: snapshot-hub
     env_file:
       - .env
-    # environment:
+    environment:
+      RATE_LIMIT_DATABASE_URL: redis://redis:6379
       # HUB_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
       # SEQ_DATABASE_URL: mysql://admin:pwd@snapshot-mysql:3306/snapshot
 
