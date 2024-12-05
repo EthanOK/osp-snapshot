@@ -1,7 +1,11 @@
 import snapshot from "@snapshot-labs/snapshot.js";
 import { Web3Provider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
-import { Proposal, Vote } from "@snapshot-labs/snapshot.js/src/sign/types";
+import {
+  Proposal,
+  ProposalType,
+  Vote
+} from "@snapshot-labs/snapshot.js/src/sign/types";
 import Client from "@snapshot-labs/snapshot.js/dist/src/sign";
 import { fetchRequest } from "./utils/util";
 
@@ -26,6 +30,23 @@ export interface Message {
     address: string;
     receipt: string;
   };
+}
+
+export interface CreateProposalPrams {
+  space: string;
+  type: ProposalType;
+  title: string;
+  choices: string[];
+  start: number;
+  end: number;
+  snapshot: number;
+}
+
+export interface VotePrams {
+  space: string;
+  proposal: string;
+  type: ProposalType;
+  choice: number | number[] | string | { [key: string]: number };
 }
 
 /**
@@ -98,9 +119,16 @@ export class SnapShotSignClient {
   async signCreateProposal(
     web3: Web3Provider | Wallet,
     address: string,
-    message: Proposal
+    params: CreateProposalPrams
   ): Promise<Message> {
     try {
+      const message: Proposal = {
+        ...params,
+        body: "",
+        discussion: "",
+        labels: [],
+        plugins: JSON.stringify({})
+      };
       const result = await this.signClient.proposal(web3, address, message);
       return result as Message;
     } catch (error) {

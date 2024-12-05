@@ -1,13 +1,13 @@
 import { ProposalState, SnapShotGraphQLClient } from "../src";
 import { expect } from "chai";
 import dotenv from "dotenv";
+import { butterSpaceId, hubUrl } from "./config";
 dotenv.config();
 
 describe("Test SnapShot GraphQL Client", () => {
-  const hub_URL = "http://localhost:3000";
-  const queryClient = new SnapShotGraphQLClient(hub_URL, "osp_snapshot_apiKey");
+  const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
 
-  const spaceId_ = "ethan.osp";
+  const spaceId_ = butterSpaceId;
   let proposalId_ = null;
   let voter_ = null;
 

@@ -52,6 +52,7 @@
     "prettier": "prettier --write \"{src,tests}/**/*.{js,ts,tsx,json,css,md}\"",
     "build": "tsup ./src/index.ts --format esm,cjs --dts",
     "typedoc": "typedoc src/index.ts",
-    "test": "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/*.spec.ts"
+    "test:sign": "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/01-sign.spec.ts",
+    "test:graphql": "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/02-graphql.spec.ts"
   }
 }

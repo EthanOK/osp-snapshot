@@ -14,13 +14,11 @@ async function main() {
 
     const account = "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2";
 
-    const validate = await scoreClient.validate(
-      proposal.validation.name,
-      proposal.validation.params,
+    const validate = await scoreClient.proposalValidate(
+      proposal.validation,
       proposal.strategies,
       account,
       proposal.network,
-      proposal.snapshot,
       proposal.space.id
     );
     console.log("validate", validate);

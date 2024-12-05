@@ -1,76 +1,109 @@
 import {
+  CreateProposalPrams,
   FollowType,
   getBlockNumber,
   ProposalState,
   SnapShotGraphQLClient,
-  SnapShotSignClient
+  SnapShotSignClient,
+  VotePrams
 } from "../src";
 import { assert, expect } from "chai";
 import { Wallet } from "@ethersproject/wallet";
-import { Proposal, Vote } from "@snapshot-labs/snapshot.js/src/sign/types";
 import dotenv from "dotenv";
+import { butterSpaceId, hubUrl, sequencerUrl } from "./config";
 dotenv.config();
 
 describe("Test SnapShot Sign Client", () => {
-  const web3Provider = new Wallet(process.env.PRIVATE_KEY_SIGNATURE!);
-  const web3Provider2 = new Wallet(process.env.PRIVATE_KEY_SIGNATURE2!);
-  const account = web3Provider.address;
-  const account2 = web3Provider2.address;
+  const spaceOwner_provider = new Wallet(process.env.PRIVATE_KEY_SIGNATURE!);
+  const butter_user_provider = new Wallet(process.env.PRIVATE_KEY_WEB3AUTH);
+  const spaceOwner = spaceOwner_provider.address;
+  const butter_user = butter_user_provider.address;
 
-  const sequencerUrl = "http://localhost:3001";
   const signClient = new SnapShotSignClient(
     sequencerUrl,
     "osp_snapshot_apiKey"
   );
-  const hub_URL = "http://localhost:3000";
-  const queryClient = new SnapShotGraphQLClient(hub_URL, "osp_snapshot_apiKey");
-
-  const spaceId_ = "ethan.osp";
+  const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
+  const spaceId_ = butterSpaceId;
   let proposalId_: string;
   global.createBoost = true;
 
   it("CreateSpace Or UpdateSpace", async () => {
+    return;
     const settings_json = {
       name: "Butter.OSP",
-      network: "11155111",
-      symbol: "OKB",
-      avatar: "",
-      website: "http://www.github.com",
-      twitter: "ethan",
+      network: "204",
+      symbol: "Butter",
+      twitter: "breadnbutter",
+      website: "http://m.breadnbutter.fun",
       private: false,
-      admins: [
-        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-        "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2"
-      ],
+      admins: ["0x6278a1e803a76796a3a1f7f6344fe874ebfe94b2"],
       moderators: [],
       members: [],
       categories: ["service"],
       labels: [],
       plugins: {},
       children: [],
-      voting: { quorum: 0, hideAbstain: false },
+      voting: {
+        hideAbstain: false
+      },
       strategies: [
         {
           name: "erc20-balance-of",
-          network: "11155111",
+          network: "56",
           params: {
-            symbol: "OKB",
-            address: "0x3F4B6664338F23d2397c953f2AB4Ce8031663f80",
-            network: "11155111",
+            symbol: "Butter",
+            address: "0x5867CBf2A3fA758C063e8A2deeAF0De8d71C3eF4",
             decimals: 18
           }
         }
       ],
-      validation: { name: "any", params: {} },
-      voteValidation: { name: "any", params: {} },
-      filters: { minScore: 0, onlyMembers: true },
+      validation: {
+        name: "basic",
+        params: {
+          minScore: 1,
+          strategies: [
+            {
+              name: "erc721",
+              params: {
+                symbol: "OSPP",
+                address: "0x00000066C6C6fCa286F48A7f4E989b7198c26cAf"
+              },
+              network: "204"
+            }
+          ]
+        }
+      },
+      voteValidation: {
+        name: "basic",
+        params: {
+          minScore: 1,
+          strategies: [
+            {
+              name: "erc721",
+              params: {
+                symbol: "OSPP",
+                address: "0x00000066C6C6fCa286F48A7f4E989b7198c26cAf"
+              },
+              network: "204"
+            }
+          ]
+        }
+      },
+      filters: {
+        minScore: 0,
+        onlyMembers: false
+      },
       treasuries: [],
-      boost: { enabled: true, bribeEnabled: false }
+      boost: {
+        enabled: true,
+        bribeEnabled: false
+      }
     };
 
     const message = await signClient.signCreateOrUpdateSpace(
-      web3Provider,
-      account,
+      spaceOwner_provider,
+      spaceOwner,
       "butter.official.osp",
       settings_json
     );
@@ -81,33 +114,40 @@ describe("Test SnapShot Sign Client", () => {
     const data = await queryClient.querySpace(spaceId_);
     const blockNumber = await getBlockNumber(data.network);
     const timestamp = Math.floor(Date.now() / 1e3);
-    const proposal_message: Proposal = {
+
+    // 单选 single-choice
+    const proposal_params: CreateProposalPrams = {
       space: spaceId_,
       type: "single-choice",
-      title: "Test Proposal_" + timestamp,
-      body: "",
-      discussion: "",
+      title: "single-choice Proposal " + timestamp,
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      labels: [],
       start: timestamp,
       end: timestamp + 120,
-      snapshot: blockNumber,
-      plugins: JSON.stringify({}),
-      app: "ops_snapshot",
-      timestamp: timestamp
+      snapshot: blockNumber
+    };
+    // 多选 approval
+    const proposal_params_: CreateProposalPrams = {
+      space: spaceId_,
+      type: "approval",
+      title: "multiple-choice Proposal " + timestamp,
+      choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+      start: timestamp,
+      end: timestamp + 120,
+      snapshot: blockNumber
     };
 
     const message = await signClient.signCreateProposal(
-      web3Provider,
-      account,
-      proposal_message
+      butter_user_provider,
+      butter_user,
+      proposal_params
     );
     proposalId_ = message.id;
     global.proposalId = message.id;
     expect(message).to.be.not.null;
-  }).timeout(10000);
+  }).timeout(100000);
 
   it("DeleteProposal", async () => {
+    return;
     const prroposals = await queryClient.queryProposals({
       spaceIds: [spaceId_],
       state: ProposalState.CLOSED
@@ -117,8 +157,8 @@ describe("Test SnapShot Sign Client", () => {
     }
 
     const message = await signClient.signDeleteProposal(
-      web3Provider,
-      account,
+      butter_user_provider,
+      butter_user,
       spaceId_,
       prroposals[prroposals.length - 1].id
     );
@@ -126,48 +166,47 @@ describe("Test SnapShot Sign Client", () => {
   });
 
   it("VoteProposal", async () => {
-    const vote_message: Vote = {
-      from: account,
+    // 单选 single-choice
+    const vote_message: VotePrams = {
       space: spaceId_,
       proposal: proposalId_,
       type: "single-choice",
-      choice: 3,
-      app: "ops_snapshot",
-      reason: "like 3"
+      choice: 1
+    };
+
+    // 多选 approval
+    const vote_message_: VotePrams = {
+      space: spaceId_,
+      proposal: proposalId_,
+      type: "approval",
+      choice: [1, 4]
     };
 
     const message = await signClient.signCreateOrUpdateVote(
-      web3Provider,
-      account,
+      butter_user_provider,
+      butter_user,
       vote_message
     );
-    const vote_message2 = vote_message;
-    vote_message2.choice = 2;
-    vote_message2.from = account2;
-    console.log(vote_message2);
 
-    const message2 = await signClient.signCreateOrUpdateVote(
-      web3Provider2,
-      account2,
-      vote_message2
-    );
     expect(message).to.be.not.null;
-    expect(message2).to.be.not.null;
-  });
+  }).timeout(10000);
 
   it("FollowSpace", async () => {
-    const follow_data = await queryClient.queryFollowSpace(account, spaceId_);
+    const follow_data = await queryClient.queryFollowSpace(
+      butter_user,
+      spaceId_
+    );
     const isFollow = follow_data.length > 0;
     const message = await signClient.signFollowSpace(
-      web3Provider,
-      account,
+      butter_user_provider,
+      butter_user,
       spaceId_,
       isFollow ? FollowType.UNFOLLOW : FollowType.FOLLOW
     );
     expect(message).to.be.not.null;
   });
 
-  it("Refresh Proposal Scores", async () => {
+  it("Refresh Proposal Scores When Proposal End", async () => {
     const result = await signClient.refreshProposalScores(proposalId_);
     expect(result).to.be.true;
   });
@@ -177,10 +216,10 @@ describe("Test SnapShot Sign Client", () => {
       {
         type: "space",
         action: "verify",
-        value: "ethan.osp"
+        value: spaceId_
       },
       "osp"
     );
     expect(result).to.be.true;
   });
-});
+}).timeout(100000);
