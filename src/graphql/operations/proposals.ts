@@ -79,7 +79,8 @@ export default async function (parent, args) {
 
   let orderBy = args.orderBy || 'created';
   let orderDirection = args.orderDirection || 'desc';
-  if (!['created', 'start', 'end'].includes(orderBy)) orderBy = 'created';
+  if (!['created', 'start', 'end', 'scores_total', 'votes'].includes(orderBy))
+    orderBy = 'created';
   orderBy = `p.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
