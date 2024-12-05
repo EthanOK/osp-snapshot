@@ -1,4 +1,5 @@
 import {
+  ChoiceType,
   CreateProposalPrams,
   FollowType,
   getBlockNumber,
@@ -26,6 +27,7 @@ describe("Test SnapShot Sign Client", () => {
   const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
   const spaceId_ = butterSpaceId;
   let proposalId_: string;
+  let proposalId_multi_: string;
   global.createBoost = true;
 
   it("CreateSpace Or UpdateSpace", async () => {
@@ -110,26 +112,15 @@ describe("Test SnapShot Sign Client", () => {
     expect(message).to.be.not.null;
   }).timeout(10000);
 
-  it("CreateProposal", async () => {
+  it("Create single-choice Proposal", async () => {
     const data = await queryClient.querySpace(spaceId_);
     const blockNumber = await getBlockNumber(data.network);
     const timestamp = Math.floor(Date.now() / 1e3);
 
-    // 单选 single-choice
     const proposal_params: CreateProposalPrams = {
       space: spaceId_,
-      type: "single-choice",
+      type: ChoiceType.SINGLE,
       title: "single-choice Proposal " + timestamp,
-      choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      start: timestamp,
-      end: timestamp + 120,
-      snapshot: blockNumber
-    };
-    // 多选 approval
-    const proposal_params_: CreateProposalPrams = {
-      space: spaceId_,
-      type: "approval",
-      title: "multiple-choice Proposal " + timestamp,
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       start: timestamp,
       end: timestamp + 120,
@@ -143,6 +134,30 @@ describe("Test SnapShot Sign Client", () => {
     );
     proposalId_ = message.id;
     global.proposalId = message.id;
+    expect(message).to.be.not.null;
+  }).timeout(10000);
+
+  it("Create mutiple-choice Proposal", async () => {
+    const data = await queryClient.querySpace(spaceId_);
+    const blockNumber = await getBlockNumber(data.network);
+    const timestamp = Math.floor(Date.now() / 1e3);
+
+    const proposal_params: CreateProposalPrams = {
+      space: spaceId_,
+      type: ChoiceType.MULTIPLE,
+      title: "multiple-choice Proposal " + timestamp,
+      choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+      start: timestamp,
+      end: timestamp + 120,
+      snapshot: blockNumber
+    };
+
+    const message = await signClient.signCreateProposal(
+      butter_user_provider,
+      butter_user,
+      proposal_params
+    );
+    proposalId_multi_ = message.id;
     expect(message).to.be.not.null;
   }).timeout(100000);
 
@@ -165,20 +180,29 @@ describe("Test SnapShot Sign Client", () => {
     expect(message).to.be.not.null;
   });
 
-  it("VoteProposal", async () => {
-    // 单选 single-choice
+  it("Vote single Proposal", async () => {
     const vote_message: VotePrams = {
       space: spaceId_,
       proposal: proposalId_,
-      type: "single-choice",
+      type: ChoiceType.SINGLE,
       choice: 1
     };
 
-    // 多选 approval
-    const vote_message_: VotePrams = {
+    const message = await signClient.signCreateOrUpdateVote(
+      butter_user_provider,
+      butter_user,
+      vote_message
+    );
+
+    expect(message).to.be.not.null;
+  }).timeout(10000);
+
+  it("Vote multiple Proposal", async () => {
+    const vote_message: VotePrams = {
       space: spaceId_,
-      proposal: proposalId_,
-      type: "approval",
+      proposal: proposalId_multi_,
+      type: ChoiceType.MULTIPLE,
+      // [1] [2] [1, 2]
       choice: [1, 4]
     };
 

@@ -32,6 +32,11 @@ export interface Message {
   };
 }
 
+export enum ChoiceType {
+  SINGLE = "single-choice",
+  MULTIPLE = "approval"
+}
+
 export interface CreateProposalPrams {
   space: string;
   type: ProposalType;

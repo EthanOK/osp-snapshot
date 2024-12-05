@@ -31,10 +31,19 @@ describe("Test SnapShot GraphQL Client", () => {
   it("queryProposals by spaceIds", async () => {
     const proposals = await queryClient.queryProposals({
       spaceIds: [spaceId_],
-      state: ProposalState.ALL
+      first: 10,
+      state: ProposalState.ACTIVE,
+      orderBy: "scores_total"
     });
     for (const proposal of proposals) {
-      console.log("proposalId:", proposal.id);
+      console.log(
+        "votes:",
+        proposal.votes,
+        "created:",
+        proposal.created,
+        "end:",
+        proposal.end
+      );
       if (proposalId_ === null) {
         proposalId_ = proposal.id;
       }
@@ -79,4 +88,4 @@ describe("Test SnapShot GraphQL Client", () => {
       console.log("follow space:", item.space.id);
     }
   });
-});
+}).timeout(100000);

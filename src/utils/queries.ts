@@ -94,6 +94,8 @@ export const PROPOSALS_QUERY = gql`
     $title_contains: String
     $space_verified: Boolean
     $flagged: Boolean
+    $orderBy: String
+    $orderDirection: OrderDirection
   ) {
     proposals(
       first: $first
@@ -107,6 +109,8 @@ export const PROPOSALS_QUERY = gql`
         space_verified: $space_verified
         flagged: $flagged
       }
+      orderBy: $orderBy
+      orderDirection: $orderDirection
     ) {
       id
       ipfs

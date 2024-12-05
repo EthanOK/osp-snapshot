@@ -48,6 +48,8 @@ export interface QueryProposalParam {
   state: ProposalState;
   first?: number;
   title_contains?: string;
+  orderBy?: string;
+  orderDirection?: "asc" | "desc";
 }
 
 /**
@@ -163,7 +165,9 @@ export class SnapShotGraphQLClient {
           space_in: params.spaceIds,
           state: params.state,
           title_contains: params.title_contains,
-          flagged: false
+          flagged: false,
+          orderBy: params.orderBy || "created",
+          orderDirection: params.orderDirection || "desc"
         }
       },
       "proposals"
