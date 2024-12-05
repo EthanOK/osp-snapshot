@@ -1,21 +1,21 @@
 import { ProposalState, ScoreClient, SnapShotGraphQLClient } from "../src";
 import { expect } from "chai";
+import { butterSpaceId, hubUrl, scoreApiUrl } from "./config";
 
 describe("Test Score Client", () => {
-  const hub_URL = "http://localhost:3000";
-  const score_URL = "http://localhost:3003";
-  const queryClient = new SnapShotGraphQLClient(hub_URL, "osp_snapshot_apiKey");
-  const scoreClient = new ScoreClient(score_URL, "osp_snapshot_apiKey");
+  const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
+  const scoreClient = new ScoreClient(scoreApiUrl, "osp_snapshot_apiKey");
   let proposal: any;
-  const account = "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2";
+  const butter_user_bind_eoa = "0x000000B1cf3c8Df89d748DcBEA3C970E1bcf4039";
+  const butter_user_aa = "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d";
 
   it("get voting power account in proposal", async () => {
     proposal = await queryClient.queryProposal(
-      "0x214288542f501685317f4d4cfb8c17f3ff84b52c4e1766096736e12251ab3613"
+      "0xf9c9c362ae9318dcd5fe6c95c997904fa1e2d82f8f1bd7dc83d8ab19ed3eb596"
     );
 
     const vp = await scoreClient.getVotingPower(
-      account,
+      butter_user_bind_eoa,
       proposal.network,
       proposal.strategies,
       proposal.snapshot,
@@ -25,11 +25,11 @@ describe("Test Score Client", () => {
   });
 
   it("validate account have proposal power", async () => {
-    const space = await queryClient.querySpace("butter.official.osp");
+    const space = await queryClient.querySpace(butterSpaceId);
     const validate = await scoreClient.proposalValidate(
       space.validation,
       space.strategies,
-      "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d",
+      butter_user_aa,
       space.network,
       space.id
     );
@@ -40,20 +40,17 @@ describe("Test Score Client", () => {
     const validate = await scoreClient.voteValidate(
       proposal.validation,
       proposal.strategies,
-      account,
+      butter_user_aa,
       proposal.network,
       proposal.snapshot,
       proposal.space.id
     );
-    console.log("validate:", validate);
+    console.log("validate vote power:", validate);
   });
 
   it("get scores accounts in proposal", async () => {
     const scores = await scoreClient.getScores(
-      [
-        "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2",
-        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-      ],
+      ["0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2", butter_user_bind_eoa],
       proposal.network,
       proposal.strategies,
       proposal.snapshot,

@@ -142,7 +142,10 @@ export class ScoreClient {
     snapshot_: number | "latest",
     space = "spaceId"
   ): Promise<boolean> {
-    if (validation.name == "basic") validation.params.strategies = strategies;
+    const params = validation.params || {};
+    if (validation.name == "basic") {
+      params.strategies = params.strategies ?? strategies;
+    }
     const validateRes = await snapshot.utils.validate(
       validation.name,
       account,
