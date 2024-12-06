@@ -26,10 +26,18 @@ export enum FollowType {
 export interface Message {
   id: string;
   ipfs: string;
-  relayer: {
-    address: string;
-    receipt: string;
-  };
+}
+
+/**
+ * Sign Response Data
+ * @param code number
+ * @param data
+ * @param error string
+ */
+export interface ResponseData {
+  code: number;
+  data?: Message;
+  error?: string;
 }
 
 export enum ChoiceType {
@@ -47,7 +55,7 @@ export interface CreateProposalPrams {
   snapshot: number;
 }
 
-export interface VotePrams {
+export interface CreateVotePrams {
   space: string;
   proposal: string;
   type: ProposalType;
@@ -100,18 +108,25 @@ export class SnapShotSignClient {
     address: string,
     spaceId: string,
     settings: any
-  ): Promise<Message> {
+  ): Promise<ResponseData> {
+    let result: ResponseData;
     try {
       snapshot.utils.validateSchema(snapshot.schemas.space, settings);
-      const result = await this.signClient.space(web3, address, {
+      const message = await this.signClient.space(web3, address, {
         space: spaceId,
         settings: JSON.stringify(settings)
       });
-      return result as Message;
+      result = {
+        code: 200,
+        data: message as Message
+      };
     } catch (error) {
-      console.log("error:", error);
-      return null;
+      result = {
+        code: 400,
+        error: error.error_description
+      };
     }
+    return result;
   }
 
   /**
@@ -125,21 +140,28 @@ export class SnapShotSignClient {
     web3: Web3Provider | Wallet,
     address: string,
     params: CreateProposalPrams
-  ): Promise<Message> {
+  ): Promise<ResponseData> {
+    let result: ResponseData;
     try {
-      const message: Proposal = {
+      const proposal: Proposal = {
         ...params,
         body: "",
         discussion: "",
         labels: [],
         plugins: JSON.stringify({})
       };
-      const result = await this.signClient.proposal(web3, address, message);
-      return result as Message;
+      const message = await this.signClient.proposal(web3, address, proposal);
+      result = {
+        code: 200,
+        data: message as Message
+      };
     } catch (error) {
-      console.log("error:", error);
-      return null;
+      result = {
+        code: 400,
+        error: error.error_description
+      };
     }
+    return result;
   }
 
   /**
@@ -155,17 +177,24 @@ export class SnapShotSignClient {
     address: string,
     spaceId: string,
     proposalId: string
-  ): Promise<Message> {
+  ): Promise<ResponseData> {
+    let result: ResponseData;
     try {
-      const result = await this.signClient.cancelProposal(web3, address, {
+      const message = await this.signClient.cancelProposal(web3, address, {
         space: spaceId,
         proposal: proposalId
       });
-      return result as Message;
+      result = {
+        code: 200,
+        data: message as Message
+      };
     } catch (error) {
-      console.log("error:", error);
-      return null;
+      result = {
+        code: 400,
+        error: error.error_description
+      };
     }
+    return result;
   }
 
   /**
@@ -175,41 +204,25 @@ export class SnapShotSignClient {
    * @param message
    * @returns
    */
-  async signCreateOrUpdateVote(
+  async signCreateVote(
     web3: Web3Provider | Wallet,
     address: string,
-    message: Vote
-  ): Promise<Message> {
+    params: CreateVotePrams
+  ): Promise<ResponseData> {
+    let result: ResponseData;
     try {
-      const result = await this.signClient.vote(web3, address, message);
-      return result as Message;
+      const message = await this.signClient.vote(web3, address, params);
+      result = {
+        code: 200,
+        data: message as Message
+      };
     } catch (error) {
-      console.log("error:", error);
-      return null;
+      result = {
+        code: 400,
+        error: error.error_description
+      };
     }
-  }
-
-  /**
-   * Sign set alias
-   * @param web3
-   * @param address
-   * @param alias
-   * @returns
-   */
-  async signSetAlias(
-    web3: Web3Provider | Wallet,
-    address: string,
-    alias: string
-  ): Promise<Message> {
-    try {
-      const result = await this.signClient.alias(web3, address, {
-        alias: alias
-      });
-      return result as Message;
-    } catch (error) {
-      console.log("error:", error);
-      return null;
-    }
+    return result;
   }
 
   /**
@@ -227,27 +240,34 @@ export class SnapShotSignClient {
     spaceId: string,
     type: FollowType,
     network = "s"
-  ): Promise<Message> {
+  ): Promise<ResponseData> {
+    let result: ResponseData;
     try {
-      let result: any;
+      let message: any;
       if (type === FollowType.UNFOLLOW) {
-        result = await this.signClient.unfollow(web3, address, {
+        message = await this.signClient.unfollow(web3, address, {
           from: address,
           space: spaceId,
           network: network == "s" ? "s" : "s-tn"
         });
       } else {
-        result = await this.signClient.follow(web3, address, {
+        message = await this.signClient.follow(web3, address, {
           from: address,
           space: spaceId,
           network: network == "s" ? "s" : "s-tn"
         });
       }
-      return result as Message;
+      result = {
+        code: 200,
+        data: message as Message
+      };
     } catch (error) {
-      console.log("error:", error);
-      return null;
+      result = {
+        code: 400,
+        error: error.error_description
+      };
     }
+    return result;
   }
 
   /**

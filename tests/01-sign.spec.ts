@@ -6,7 +6,7 @@ import {
   ProposalState,
   SnapShotGraphQLClient,
   SnapShotSignClient,
-  VotePrams
+  CreateVotePrams
 } from "../src";
 import { assert, expect } from "chai";
 import { Wallet } from "@ethersproject/wallet";
@@ -16,12 +16,13 @@ dotenv.config();
 
 describe("Test SnapShot Sign Client", () => {
   const spaceOwner_provider = new Wallet(process.env.PRIVATE_KEY_SIGNATURE!);
-  const butter_user_provider = new Wallet(process.env.PRIVATE_KEY_WEB3AUTH);
   const spaceOwner = spaceOwner_provider.address;
-  const butter_user = butter_user_provider.address;
+  const butter_user_provider = new Wallet(process.env.PRIVATE_KEY_WEB3AUTH);
+  const butter_user_aa = "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d";
 
   const signClient = new SnapShotSignClient(
     sequencerUrl,
+    // "http://localhost:3001",
     "osp_snapshot_apiKey"
   );
   const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
@@ -103,13 +104,14 @@ describe("Test SnapShot Sign Client", () => {
       }
     };
 
-    const message = await signClient.signCreateOrUpdateSpace(
+    const response = await signClient.signCreateOrUpdateSpace(
       spaceOwner_provider,
       spaceOwner,
       "butter.official.osp",
       settings_json
     );
-    expect(message).to.be.not.null;
+    expect(response.code).to.be.equal(200);
+    console.log("CreateSpace Or UpdateSpace", response);
   }).timeout(10000);
 
   it("Create single-choice Proposal", async () => {
@@ -123,18 +125,19 @@ describe("Test SnapShot Sign Client", () => {
       title: "single-choice Proposal " + timestamp,
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       start: timestamp,
-      end: timestamp + 120,
+      end: timestamp + 1200,
       snapshot: blockNumber
     };
 
-    const message = await signClient.signCreateProposal(
+    const response = await signClient.signCreateProposal(
       butter_user_provider,
-      butter_user,
+      butter_user_aa,
       proposal_params
     );
-    proposalId_ = message.id;
-    global.proposalId = message.id;
-    expect(message).to.be.not.null;
+    proposalId_ = response.data.id;
+    global.proposalId = proposalId_;
+    expect(response.code).to.be.equal(200);
+    console.log("Create single-choice Proposal\n", response);
   }).timeout(10000);
 
   it("Create mutiple-choice Proposal", async () => {
@@ -148,17 +151,18 @@ describe("Test SnapShot Sign Client", () => {
       title: "multiple-choice Proposal " + timestamp,
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       start: timestamp,
-      end: timestamp + 120,
+      end: timestamp + 1200,
       snapshot: blockNumber
     };
 
-    const message = await signClient.signCreateProposal(
+    const response = await signClient.signCreateProposal(
       butter_user_provider,
-      butter_user,
+      butter_user_aa,
       proposal_params
     );
-    proposalId_multi_ = message.id;
-    expect(message).to.be.not.null;
+    proposalId_multi_ = response.data.id;
+    expect(response.code).to.be.equal(200);
+    console.log("Create mutiple-choice Proposal\n", response);
   }).timeout(100000);
 
   it("DeleteProposal", async () => {
@@ -173,7 +177,7 @@ describe("Test SnapShot Sign Client", () => {
 
     const message = await signClient.signDeleteProposal(
       butter_user_provider,
-      butter_user,
+      butter_user_aa,
       spaceId_,
       prroposals[prroposals.length - 1].id
     );
@@ -181,24 +185,43 @@ describe("Test SnapShot Sign Client", () => {
   });
 
   it("Vote single Proposal", async () => {
-    const vote_message: VotePrams = {
+    const vote_message: CreateVotePrams = {
       space: spaceId_,
       proposal: proposalId_,
       type: ChoiceType.SINGLE,
       choice: 1
     };
 
-    const message = await signClient.signCreateOrUpdateVote(
+    const response = await signClient.signCreateVote(
       butter_user_provider,
-      butter_user,
+      butter_user_aa,
       vote_message
     );
 
-    expect(message).to.be.not.null;
+    expect(response.code).to.be.equal(200);
+    console.log("Vote single Proposal\n", response);
+  }).timeout(10000);
+
+  it("Vote single Proposal Should failure", async () => {
+    const vote_message: CreateVotePrams = {
+      space: spaceId_,
+      proposal: proposalId_,
+      type: ChoiceType.SINGLE,
+      choice: 1
+    };
+
+    const response = await signClient.signCreateVote(
+      butter_user_provider,
+      butter_user_aa,
+      vote_message
+    );
+
+    expect(response.code).to.be.equal(400);
+    console.log("Vote single Proposal Should failure\n", response);
   }).timeout(10000);
 
   it("Vote multiple Proposal", async () => {
-    const vote_message: VotePrams = {
+    const vote_message: CreateVotePrams = {
       space: spaceId_,
       proposal: proposalId_multi_,
       type: ChoiceType.MULTIPLE,
@@ -206,28 +229,29 @@ describe("Test SnapShot Sign Client", () => {
       choice: [1, 4]
     };
 
-    const message = await signClient.signCreateOrUpdateVote(
+    const response = await signClient.signCreateVote(
       butter_user_provider,
-      butter_user,
+      butter_user_aa,
       vote_message
     );
 
-    expect(message).to.be.not.null;
+    expect(response.code).to.be.equal(200);
+    console.log("Vote multiple Proposal\n", response);
   }).timeout(10000);
 
   it("FollowSpace", async () => {
     const follow_data = await queryClient.queryFollowSpace(
-      butter_user,
+      butter_user_aa,
       spaceId_
     );
     const isFollow = follow_data.length > 0;
-    const message = await signClient.signFollowSpace(
+    const response = await signClient.signFollowSpace(
       butter_user_provider,
-      butter_user,
+      butter_user_aa,
       spaceId_,
       isFollow ? FollowType.UNFOLLOW : FollowType.FOLLOW
     );
-    expect(message).to.be.not.null;
+    expect(response.code).to.be.equal(200);
   });
 
   it("Refresh Proposal Scores When Proposal End", async () => {

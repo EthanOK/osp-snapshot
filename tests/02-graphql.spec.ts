@@ -33,7 +33,7 @@ describe("Test SnapShot GraphQL Client", () => {
       spaceIds: [spaceId_],
       first: 10,
       state: ProposalState.ACTIVE,
-      orderBy: "scores_total"
+      orderBy: "votes"
     });
     for (const proposal of proposals) {
       console.log(
@@ -64,6 +64,14 @@ describe("Test SnapShot GraphQL Client", () => {
     );
     console.log("votes list:\n", voteslist);
     voter_ = voteslist[0].voter;
+  });
+
+  it("queryVotes by proposalId and voter", async () => {
+    const votes = await queryClient.queryVotesByProposalId({
+      proposalId: proposalId_,
+      voter: voter_
+    });
+    console.log("vote", votes);
   });
 
   it("queryVotes by voter", async () => {
