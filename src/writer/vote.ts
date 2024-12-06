@@ -147,7 +147,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   // Reject vote with later timestamp
   // TODO: don't update previous vote
   if (votes[0]) {
-    return Promise.reject(`already voted at this prposal`);
+    return Promise.reject(`already voted at this proposal`);
     if (votes[0].created > parseInt(msg.timestamp)) {
       return Promise.reject('already voted at later time');
     } else if (votes[0].created === parseInt(msg.timestamp)) {
