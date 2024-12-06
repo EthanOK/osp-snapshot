@@ -10,7 +10,6 @@ import { containsFlaggedLinks, flaggedAddresses } from '../helpers/moderation';
 import { isMalicious } from '../helpers/monitoring';
 import db from '../helpers/mysql';
 import { captureError, getQuorum, jsonParse, validateChoices } from '../helpers/utils';
-import { getOspAccounts } from '../osp';
 
 const scoreAPIUrl = process.env.SCORE_API_URL || 'https://score.snapshot.org';
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
@@ -148,13 +147,10 @@ export async function verify(body): Promise<any> {
           validationParams.minScore = minScore;
           validationParams.strategies = space.validation?.params?.strategies || space.strategies;
         }
-        // TODO: get osp Accounts By web3auth account
-        const accounts = await getOspAccounts(body.address, space.network);
-        // console.log('accounts:', accounts);
 
         isValid = await snapshot.utils.validate(
           validationName,
-          accounts?.abstractAccount || body.address,
+          body.address,
           space.id,
           space.network,
           'latest',

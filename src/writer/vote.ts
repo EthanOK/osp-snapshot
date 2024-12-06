@@ -5,7 +5,7 @@ import log from '../helpers/log';
 import db from '../helpers/mysql';
 import { captureError, hasStrategyOverride, jsonParse } from '../helpers/utils';
 import { updateProposalAndVotes } from '../scores';
-import { getOspAccounts } from '../osp';
+import { getOspBindEOAByAA } from '../osp';
 
 const scoreAPIUrl = process.env.SCORE_API_URL || 'https://score.snapshot.org';
 
@@ -47,9 +47,8 @@ export async function verify(body): Promise<any> {
       return Promise.reject('invalid choice');
   }
   
-  // TODO: get osp Accounts By web3auth account
-  const accounts = await getOspAccounts(body.address, proposal.network);
-  // console.log('accounts:', accounts);
+  // TODO: getOspBindEOAByAA
+  const bindEOA = await getOspBindEOAByAA(body.address, proposal.network);
 
   if (proposal.validation?.name && proposal.validation.name !== 'any') {
     try {
@@ -61,7 +60,7 @@ export async function verify(body): Promise<any> {
 
       const validate = await snapshot.utils.validate(
         validationName,
-        accounts?.abstractAccount || body.address,
+        body.address,
         msg.space,
         proposal.network,
         proposal.snapshot,
@@ -83,7 +82,7 @@ export async function verify(body): Promise<any> {
   let vp: any = {};
   try {
     vp = await snapshot.utils.getVp(
-      accounts?.bindEOA || body.address,
+      bindEOA || body.address,
       proposal.network,
       proposal.strategies,
       proposal.snapshot,
@@ -148,7 +147,7 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   // Reject vote with later timestamp
   // TODO: don't update previous vote
   if (votes[0]) {
-    return Promise.reject(`${voter} in proposal ${proposalId} already voted`);
+    return Promise.reject(`${voter} already voted`);
     if (votes[0].created > parseInt(msg.timestamp)) {
       return Promise.reject('already voted at later time');
     } else if (votes[0].created === parseInt(msg.timestamp)) {
