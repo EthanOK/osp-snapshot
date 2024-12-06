@@ -249,7 +249,7 @@ export default async function ingestor(req) {
       // TODO: pin to IPFS
       // [pinned, receipt]
       [receipt] = await Promise.all([
-        pin(ipfsBody, process.env.PINEAPPLE_URL),
+        // pin(ipfsBody, process.env.PINEAPPLE_URL),
         issueReceipt(formattedSignature)
       ]);
     } catch (e) {
@@ -257,7 +257,7 @@ export default async function ingestor(req) {
       return Promise.reject('pinning failed');
     }
     // const ipfs = pinned.cid;
-    const ipfs = "null";
+    const ipfs = 'null';
 
     try {
       await writer[type].action(legacyBody, ipfs, receipt, id, context);
@@ -298,11 +298,11 @@ export default async function ingestor(req) {
     success = 1;
     return {
       id,
-      ipfs,
-      relayer: {
-        address: relayer.address,
-        receipt
-      }
+      ipfs
+      // relayer: {
+      //   address: relayer.address,
+      //   receipt
+      // }
     };
   } finally {
     endTimer({ status: success, type, network });
