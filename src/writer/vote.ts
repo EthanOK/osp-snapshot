@@ -49,7 +49,7 @@ export async function verify(body): Promise<any> {
   
   // TODO: get osp Accounts By web3auth account
   const accounts = await getOspAccounts(body.address, proposal.network);
-  console.log('accounts:', accounts);
+  // console.log('accounts:', accounts);
 
   if (proposal.validation?.name && proposal.validation.name !== 'any') {
     try {
@@ -146,7 +146,9 @@ export async function action(body, ipfs, receipt, id, context): Promise<void> {
   );
 
   // Reject vote with later timestamp
+  // TODO: don't update previous vote
   if (votes[0]) {
+    return Promise.reject(`${voter} in proposal ${proposalId} already voted`);
     if (votes[0].created > parseInt(msg.timestamp)) {
       return Promise.reject('already voted at later time');
     } else if (votes[0].created === parseInt(msg.timestamp)) {

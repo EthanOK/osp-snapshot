@@ -150,7 +150,7 @@ export async function verify(body): Promise<any> {
         }
         // TODO: get osp Accounts By web3auth account
         const accounts = await getOspAccounts(body.address, space.network);
-        console.log('accounts:', accounts);
+        // console.log('accounts:', accounts);
 
         isValid = await snapshot.utils.validate(
           validationName,
