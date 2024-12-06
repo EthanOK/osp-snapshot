@@ -84,6 +84,14 @@ export default async function (parent, args) {
   orderBy = `p.${orderBy}`;
   orderDirection = orderDirection.toUpperCase();
   if (!['ASC', 'DESC'].includes(orderDirection)) orderDirection = 'DESC';
+  let voter_sql = '';
+  if (where?.voter_not) {
+    voter_sql = `LEFT JOIN votes v ON p.id = v.proposal AND v.voter = '${where.voter_not}'`;
+    searchSql += ' AND v.id IS NULL';
+  }else if (where?.voter) {
+    voter_sql = `LEFT JOIN votes v ON p.id = v.proposal AND v.voter = '${where.voter}'`;
+    searchSql += ' AND v.id IS NOT NULL';
+  }
 
   const query = `
     SELECT p.*,
@@ -95,6 +103,7 @@ export default async function (parent, args) {
       spaces.hibernated as spaceHibernated
     FROM proposals p
     INNER JOIN spaces ON spaces.id = p.space
+     ${voter_sql}
     WHERE spaces.settings IS NOT NULL ${queryStr} ${searchSql}
     ORDER BY ${orderBy} ${orderDirection}, p.id ASC LIMIT ?, ?
   `;

@@ -183,6 +183,8 @@ input ProposalWhere {
   space_in: [String]
   author: String
   author_in: [String]
+  voter: String
+  voter_not: String
   network: String
   network_in: [String]
   title_contains: String
