@@ -1,0 +1,51 @@
+image: docker:19.03.13
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - docker:19.03.13-dind
+  
+images-worker-score-api:
+  stage: build
+  before_script:
+    - echo "$REGISTRY_PASS_SIG" | docker login registry-vpc.ap-southeast-1.aliyuncs.com --username taylor.dong@dipbit --password-stdin
+  tags:
+    - prod
+  only:
+    - /^.*score-api.*$/
+  script:
+    - export DATETIME=`date +%Y%m%d`
+    - sed -i 's/registry/registry-vpc/g' Dockerfile
+    - docker build --no-cache -f Dockerfile -t registry-vpc.ap-southeast-1.aliyuncs.com/kikitrade/osp-snapshot:score-api .
+    - docker push registry-vpc.ap-southeast-1.aliyuncs.com/kikitrade/osp-snapshot:score-api
+
+
+images-worker-snapshot-sequencer:
+  stage: build
+  before_script:
+    - echo "$REGISTRY_PASS_SIG" | docker login registry-vpc.ap-southeast-1.aliyuncs.com --username taylor.dong@dipbit --password-stdin
+  tags:
+    - prod
+  only:
+    - /^.*snapshot-sequencer.*$/
+  script:
+    - export DATETIME=`date +%Y%m%d`
+    - sed -i 's/registry/registry-vpc/g' Dockerfile
+    - docker build --no-cache -f Dockerfile -t registry-vpc.ap-southeast-1.aliyuncs.com/kikitrade/osp-snapshot:snapshot-sequencer .
+    - docker push registry-vpc.ap-southeast-1.aliyuncs.com/kikitrade/osp-snapshot:snapshot-sequencer
+
+images-worker-snapshot-hub:
+  stage: build
+  before_script:
+    - echo "$REGISTRY_PASS_SIG" | docker login registry-vpc.ap-southeast-1.aliyuncs.com --username taylor.dong@dipbit --password-stdin
+  tags:
+    - prod
+  only:
+    - /^.*snapshot-hub.*$/
+  script:
+    - export DATETIME=`date +%Y%m%d`
+    - sed -i 's/registry/registry-vpc/g' Dockerfile
+    - docker build --no-cache -f Dockerfile -t registry-vpc.ap-southeast-1.aliyuncs.com/kikitrade/osp-snapshot:snapshot-hub .
+    - docker push registry-vpc.ap-southeast-1.aliyuncs.com/kikitrade/osp-snapshot:snapshot-hub
