@@ -1,5 +1,5 @@
 {
-  "name": "osp-snapshot-sdk",
+  "name": "@open-social-protocol/snapshot-sdk",
   "version": "0.0.1",
   "description": "This is the snapshot sdk for OSP",
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/dengjizhang/osp-snapshot-sdk.git"
+    "url": "git+https://gitlab.com/Keccak256-evg/opensocial/osp-snapshot.git"
   },
   "homepage": "https://gitlab.com/dengjizhang",
   "keywords": [
