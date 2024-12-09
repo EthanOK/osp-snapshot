@@ -7,7 +7,7 @@ import {
   SnapShotGraphQLClient,
   SnapShotSignClient,
   CreateVotePrams
-} from "../src";
+} from "osp-snapshot-sdk";
 import { assert, expect } from "chai";
 import { Wallet } from "@ethersproject/wallet";
 import dotenv from "dotenv";
@@ -22,7 +22,6 @@ describe("Test SnapShot Sign Client", () => {
 
   const signClient = new SnapShotSignClient(
     sequencerUrl,
-    // "http://localhost:3001",
     "osp_snapshot_apiKey"
   );
   const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");

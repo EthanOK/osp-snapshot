@@ -33,17 +33,12 @@ describe("Test SnapShot GraphQL Client", () => {
       spaceIds: [spaceId_],
       first: 10,
       state: ProposalState.ACTIVE,
+      // voter_not: "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d",
       orderBy: "votes"
     });
+    console.log("proposals number:", proposals.length);
     for (const proposal of proposals) {
-      console.log(
-        "votes:",
-        proposal.votes,
-        "created:",
-        proposal.created,
-        "end:",
-        proposal.end
-      );
+      console.log("votes", proposal.votes, "proposalId:", proposal.id);
       if (proposalId_ === null) {
         proposalId_ = proposal.id;
       }
@@ -54,6 +49,18 @@ describe("Test SnapShot GraphQL Client", () => {
     const proposal = await queryClient.queryProposal(proposalId_);
     console.log("proposal author:", proposal.author);
   });
+
+  it("queryVotes by voter in proposalIds", async () => {
+    const votes = await queryClient.queryUserVotedProposalIds(
+      "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d",
+      [
+        "0xcacf444efdbc97e1414e134c096114261e78efd64cdbf43b426c26dd0c28c202",
+        "0x65a718112a3a5a669b5749c35163e1fa2d899f070b88a107ce02adbe9903b8e3",
+        "0x94d666bcd3b03eed47368a8672bc09051d7e2ea4c30cad7fbff0964d90aa9d69"
+      ]
+    );
+    console.log(JSON.stringify(votes, null, 2));
+  }).timeout(10000);
 
   it("queryVotes by proposalId", async () => {
     const voteslist = await queryClient.queryVotesByProposalId(
@@ -76,6 +83,7 @@ describe("Test SnapShot GraphQL Client", () => {
 
   it("queryVotes by voter", async () => {
     const data = await queryClient.queryVotesByVoter(voter_);
+    console.log(JSON.stringify(data, null, 2));
 
     console.log("votes number:", data.length);
     if (data.length > 0) {

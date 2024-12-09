@@ -91,6 +91,8 @@ export const PROPOSALS_QUERY = gql`
     $space: String
     $space_in: [String]
     $author_in: [String]
+    $voter: String
+    $voter_not: String
     $title_contains: String
     $space_verified: Boolean
     $flagged: Boolean
@@ -105,6 +107,8 @@ export const PROPOSALS_QUERY = gql`
         state: $state
         space_in: $space_in
         author_in: $author_in
+        voter: $voter
+        voter_not: $voter_not
         title_contains: $title_contains
         space_verified: $space_verified
         flagged: $flagged
@@ -364,8 +368,11 @@ export const PROFILES_QUERY = gql`
 export const USER_VOTED_PROPOSAL_IDS_QUERY = gql`
   query Votes($voter: String!, $proposals: [String]!) {
     votes(first: 1000, where: { voter: $voter, proposal_in: $proposals }) {
+      choice
       proposal {
         id
+        choices
+        type
       }
     }
   }

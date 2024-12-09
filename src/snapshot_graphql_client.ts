@@ -13,6 +13,7 @@ import {
   PROPOSALS_QUERY,
   SPACE_QUERY,
   SPACES_RANKING_QUERY,
+  USER_VOTED_PROPOSAL_IDS_QUERY,
   VOTES_QUERY
 } from "./utils/queries";
 import { ExtendedSpace, Proposal } from "./utils/interfaces";
@@ -47,6 +48,7 @@ export interface QueryProposalParam {
   spaceIds: string[];
   state: ProposalState;
   first?: number;
+  voter_not?: string;
   title_contains?: string;
   orderBy?: string;
   orderDirection?: "asc" | "desc";
@@ -166,6 +168,7 @@ export class SnapShotGraphQLClient {
           state: params.state,
           title_contains: params.title_contains,
           flagged: false,
+          voter_not: params.voter_not,
           orderBy: params.orderBy || "created",
           orderDirection: params.orderDirection || "desc"
         }
@@ -221,6 +224,22 @@ export class SnapShotGraphQLClient {
       reason?: string;
       created: number;
     }[];
+  }
+
+  async queryUserVotedProposalIds(voter: string, proposals: string[]) {
+    if (!voter || !proposals?.length) return [];
+    const votes = await this.apolloQuery(
+      {
+        query: USER_VOTED_PROPOSAL_IDS_QUERY,
+        variables: {
+          voter,
+          proposals
+        }
+      },
+      "votes"
+    );
+
+    return votes;
   }
 
   /**
