@@ -139,7 +139,7 @@ export class ScoreClient {
     strategies: SpaceStrategy[],
     account: string,
     network: string,
-    snapshot_: number | "latest",
+    // snapshot_: number | "latest",
     space = "spaceId"
   ): Promise<boolean> {
     const params = validation.params || {};
@@ -151,7 +151,7 @@ export class ScoreClient {
       account,
       space,
       network,
-      snapshot_,
+      "latest",
       validation.params,
       this.options
     );

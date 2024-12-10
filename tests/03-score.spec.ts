@@ -42,7 +42,6 @@ describe("Test Score Client", () => {
       proposal.strategies,
       butter_user_aa,
       proposal.network,
-      proposal.snapshot,
       proposal.space.id
     );
     console.log("validate vote power:", validate);
