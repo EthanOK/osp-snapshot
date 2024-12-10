@@ -1,0 +1,31 @@
+stages:
+  - Publish
+PublishDev:
+  only:
+    - /^ospdev-v[0-9]+.[0-9]+.*$/
+  tags:
+    - trexdev
+  image: node:18.20.2
+  stage: Publish
+  script:
+    - |
+      echo "//nexus-svc.kube-public.svc.kiki.local:8081/repository/npm-osp-hosted/:_authToken=\${DEV_CI_JOB_TOKEN}" > .npmrc && chmod 600 .npmrc
+      echo "Created the following .npmrc:"; cat .npmrc
+      npm install -g pnpm@7.15.0
+      echo "Installing dependencies..."
+      pnpm install
+      echo "Building and publishing package..."
+      pnpm run build
+      echo "Publishing package..."
+      VERSION=$(pnpm publish -r --registry=http://nexus-svc.kube-public.svc.kiki.local:8081/repository/npm-osp-hosted/ --no-git-checks|grep "+ @open-social-protocol/snapshot-sdk@") || export PUBLISH_STATUS=false
+      echo "Successfully published package to GitLab's NPM registry"
+      echo $VERSION
+      echo $PUBLISH_STATUS
+      export BUILD_DATETIME=`date +%Y-%m-%d' '%H:%M:%S -d "+8 hours"`
+
+      if [ "${PUBLISH_STATUS}" == "false" ]; then
+        # 发布失败
+        echo 'publish fail ...'
+      else
+        # 发布成功
+        echo 'publish success ...'

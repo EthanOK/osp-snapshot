@@ -12,6 +12,7 @@ const signClient = new SnapShotSignClient(
   // "http://localhost:3001",
   "osp_snapshot_apiKey"
 );
+
 async function createOSPSpace() {
   const settings_json = {
     name: "SOMON.OSP",
@@ -89,8 +90,11 @@ async function createOSPSpace() {
     "somon.official.osp",
     settings_json
   );
-  console.log("CreateSpace:");
-  console.log(response);
+  if (response.code === 200) {
+    console.log("CreateSpace Success");
+  } else {
+    console.error("CreateSpace Failed:", response.error);
+  }
 }
 
 createOSPSpace();
