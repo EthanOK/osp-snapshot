@@ -7,7 +7,9 @@ import {
   SnapShotGraphQLClient,
   SnapShotSignClient,
   CreateVotePrams
-} from "osp-snapshot-sdk";
+} from "../src";
+// } from "@open-social-protocol/snapshot-sdk";
+
 import { assert, expect } from "chai";
 import { Wallet } from "@ethersproject/wallet";
 import dotenv from "dotenv";
