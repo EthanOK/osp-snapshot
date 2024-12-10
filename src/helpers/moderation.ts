@@ -44,8 +44,8 @@ export function setData(result?: Record<string, string[]>) {
 export default async function run() {
   setData(await loadModerationData());
 
-  await snapshot.utils.sleep(12000e3);
-  run();
+  // await snapshot.utils.sleep(12000e3);
+  // run();
 }
 
 export function containsFlaggedLinks(body: string): boolean {
