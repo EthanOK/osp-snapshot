@@ -166,6 +166,7 @@ export async function getStrategyURI(
         console.error("Max reward need greater than 0");
         return null;
       }
+      break;
     default:
       break;
   }

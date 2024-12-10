@@ -182,7 +182,7 @@ describe("Test SnapShot Sign Client", () => {
       spaceId_,
       prroposals[prroposals.length - 1].id
     );
-    expect(message).to.be.not.null;
+    expect(message).to.not.equal(null);
   });
 
   it("Vote single Proposal", async () => {
@@ -257,7 +257,7 @@ describe("Test SnapShot Sign Client", () => {
 
   it("Refresh Proposal Scores When Proposal End", async () => {
     const result = await signClient.refreshProposalScores(proposalId_);
-    expect(result).to.be.true;
+    expect(result).to.equal(true);
   });
 
   it("Flag Operation", async () => {
@@ -269,6 +269,6 @@ describe("Test SnapShot Sign Client", () => {
       },
       "osp"
     );
-    expect(result).to.be.true;
+    expect(result).to.equal(true);
   });
 }).timeout(100000);

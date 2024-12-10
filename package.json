@@ -26,11 +26,14 @@
     "typedoc": "^0.26.11"
   },
   "devDependencies": {
+    "@eslint/js": "^9.16.0",
     "@types/chai": "^5.0.1",
     "@types/mocha": "^10.0.9",
     "@types/node": "^22.9.0",
     "chai": "^4.5.0",
     "dotenv": "^16.4.5",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "mocha": "^10.8.2",
@@ -39,16 +42,19 @@
     "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
     "typedoc": "^0.26.11",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.18.0"
   },
   "lint-staged": {
     "{src,tests}/**/*.{js,ts,tsx,json,css,md}": [
       "prettier --write",
-      "git add"
+      "eslint --fix"
     ]
   },
   "scripts": {
     "prepare": "husky install",
+    "lint": "eslint \"{src,tests}/**/*.{js,ts,tsx}\"",
+    "lint:fix": "eslint \"{src,tests}/**/*.{js,ts,tsx}\" --fix",
     "prettier": "prettier --write \"{src,tests}/**/*.{js,ts,tsx,json,css,md}\"",
     "build": "tsup ./src/index.ts --format esm,cjs --dts",
     "publish private": "yarn build && npm publish --registry=https://nexusdev.trex.xyz/repository/npm-osp-hosted/",

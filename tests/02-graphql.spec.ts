@@ -13,7 +13,7 @@ describe("Test SnapShot GraphQL Client", () => {
 
   it("query Spaces Rankings", async () => {
     const data = await queryClient.querySpacesRankings();
-    expect(Array.isArray(data.items)).to.be.true;
+    expect(Array.isArray(data.items)).to.equal(true);
     expect(data.items.length).to.be.greaterThanOrEqual(0);
     if (data.items.length > 0) {
       for (const item of data.items) {
@@ -25,7 +25,7 @@ describe("Test SnapShot GraphQL Client", () => {
   it("query Space", async () => {
     const data = await queryClient.querySpace(spaceId_);
     expect(data.id).to.be.equal(spaceId_);
-    expect(typeof data.name === "string").to.be.true;
+    expect(typeof data.name === "string").to.equal(true);
   });
 
   it("queryProposals by spaceIds", async () => {

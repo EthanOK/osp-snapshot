@@ -60,11 +60,11 @@ describe("Test Score Client", () => {
 
   it("get strategies", async () => {
     const strategies = await scoreClient.getStrategies();
-    expect(strategies).to.not.be.null;
+    expect(strategies).to.not.equal(null);
   });
 
   it("get validations", async () => {
     const validations = await scoreClient.getValidations();
-    expect(validations).to.not.be.null;
+    expect(validations).to.not.equal(null);
   });
 }).timeout(100000);

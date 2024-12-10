@@ -60,7 +60,7 @@ describe("Test Boost Client", () => {
       eligibility,
       distribution
     );
-    expect(strategyURI).to.not.be.null;
+    expect(strategyURI).to.not.equal(null);
     strategyURIs.push(strategyURI);
     const strategyURI_2 = await getStrategyURI(
       proposalId_,
@@ -72,7 +72,7 @@ describe("Test Boost Client", () => {
 
   it("Get boost guard address from boostGuardClient", async () => {
     guardAddress = await boostGuardClient.getGuardAddress();
-    expect(guardAddress).to.not.be.null;
+    expect(guardAddress).to.not.equal(null);
   });
 
   it("Create Boost On Chain", async () => {
