@@ -57,13 +57,14 @@ export async function verify(body): Promise<any> {
       } = proposal;
       if (validationName === 'basic')
         validationParams.strategies = validationParams.strategies ?? proposal.strategies;
-
+      // TODO: validate latest state
       const validate = await snapshot.utils.validate(
         validationName,
         body.address,
         msg.space,
         proposal.network,
-        proposal.snapshot,
+        // proposal.snapshot,
+        'latest',
         validationParams,
         { url: scoreAPIUrl }
       );
