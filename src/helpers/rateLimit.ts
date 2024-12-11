@@ -32,12 +32,22 @@ export default rateLimit({
     if (!client?.isReady) return true;
     // TODO: rate limited
     const apiKey: any = req.headers['x-api-key'] || req.query.apiKey;
-    console.log('apiKey:', apiKey);
-    const whiteList = ['https://snapshot.osp.org'];
-    const apiKeyList = ['osp_snapshot_apiKey'];
     const origin = req.headers['origin'];
-    if (origin && whiteList.includes(origin)) return true;
-    if (apiKey && apiKeyList.includes(apiKey)) return true;
+    const whitelistOrigins = process.env.WHITELIST_ORIGINS
+      ? JSON.parse(process.env.WHITELIST_ORIGINS)
+      : [];
+    const whitelistApiKeys = process.env.WHITELIST_API_KEYS
+      ? JSON.parse(process.env.WHITELIST_API_KEYS)
+      : [];
+    if (origin && whitelistOrigins.includes(origin)) {
+      console.log(`[rate-limit] ${origin} is whitelistOrigins`);
+      return true;
+    }
+    if (apiKey && whitelistApiKeys.includes(apiKey)) {
+      console.log(`[rate-limit] ${apiKey} is whitelistApiKeys`);
+      return true;
+    }
+
     return false;
   },
   handler: (req, res) => {
