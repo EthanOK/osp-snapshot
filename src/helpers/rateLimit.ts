@@ -40,14 +40,13 @@ export default rateLimit({
       ? JSON.parse(process.env.WHITELIST_API_KEYS)
       : [];
     if (origin && whitelistOrigins.includes(origin)) {
-      console.log(`[rate-limit] ${origin} is whitelistOrigins`);
+      console.log(`[rate-limit] ${origin} in whitelistOrigins`);
       return true;
     }
     if (apiKey && whitelistApiKeys.includes(apiKey)) {
-      console.log(`[rate-limit] ${apiKey} is whitelistApiKeys`);
+      console.log(`[rate-limit] ${apiKey} in whitelistApiKeys`);
       return true;
     }
-
     return false;
   },
   handler: (req, res) => {
