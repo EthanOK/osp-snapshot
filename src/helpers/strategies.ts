@@ -66,7 +66,7 @@ async function run() {
     }
     log.error(`[strategies] failed to load ${JSON.stringify(e)}`);
   }
-  await snapshot.utils.sleep(60e3);
+  await snapshot.utils.sleep(60 * 60e3);
   run();
 }
 
