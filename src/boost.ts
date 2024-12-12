@@ -5,7 +5,7 @@ import {
   Distribution,
   Eligibility
 } from "./utils/boost_types";
-import { pinGraph } from "./utils/pin_graph";
+// import { pinGraph } from "./utils/pin_graph";
 import { TransactionResponse, Web3Provider } from "@ethersproject/providers";
 import { Contract } from "@ethersproject/contracts";
 import { parseEther } from "@ethersproject/units";
@@ -187,8 +187,9 @@ export async function getStrategyURI(
     }
   };
 
-  const ipfs = await pinGraph(strategy);
-  return `ipfs://${ipfs.cid}`;
+  // const ipfs = await pinGraph(strategy);
+  // return `ipfs://${ipfs.cid}`;
+  return `ipfs://null`;
 }
 
 /**
