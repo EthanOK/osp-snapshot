@@ -10,6 +10,8 @@ import { sendError, verifyAuth } from './helpers/utils';
 import typedData from './ingestor';
 import { updateProposalAndVotes } from './scores';
 import { name, version } from '../package.json';
+import { getOspJoinNFT, ZERO_ADDRESS } from './osp';
+import { getSpace } from './helpers/actions';
 
 const router = express.Router();
 const SNAPSHOT_ENV = process.env.NETWORK || 'testnet';
@@ -54,6 +56,31 @@ router.get('/scores/:proposalId', async (req, res) => {
     capture(e);
     log.warn(`[api] updateProposalAndVotes() failed ${proposalId}, ${JSON.stringify(e)}`);
     return res.json({ error: 'failed', message: e });
+  }
+});
+
+router.get('/getOspJoinNFTBySpaceId/:spaceId', async (req, res) => {
+  const { spaceId } = req.params;
+  try {
+    const space = await getSpace(spaceId, true);
+
+    const joinNFTdata = await getOspJoinNFT(spaceId);
+    const createSpace = space == false && joinNFTdata.ospJoinNFT !== ZERO_ADDRESS;
+    return res.json({
+      code: 200,
+      createSpace: createSpace,
+      joinNFT: joinNFTdata.ospJoinNFT,
+      chainId: joinNFTdata.chainId,
+      existSpace: space == false ? false : true
+    });
+  } catch (e) {
+    capture(e);
+    log.warn(`[api] getOspJoinNFT() failed ${JSON.stringify(e)}`);
+    return res.json({
+      code: 400,
+      error: 'failed',
+      message: e
+    });
   }
 });
 

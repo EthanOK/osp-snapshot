@@ -6,6 +6,7 @@ import api from './api';
 import log from './helpers/log';
 import initMetrics from './helpers/metrics';
 import refreshModeration from './helpers/moderation';
+import refreshProposals from './helpers/updateProposals';
 import rateLimit from './helpers/rateLimit';
 import shutter from './helpers/shutter';
 
@@ -13,6 +14,7 @@ const app = express();
 
 initLogger(app);
 refreshModeration();
+refreshProposals();
 initMetrics(app);
 
 app.disable('x-powered-by');

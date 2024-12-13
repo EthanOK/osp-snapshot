@@ -119,6 +119,9 @@ export default async function ingestor(req) {
 
     // Check if signature is valid
     try {
+      if (type === 'settings') {
+        network = JSON.parse(body.data.message.settings).network;
+      }
       const isValidSig = await snapshot.utils.verify(body.address, body.sig, body.data, network, {
         broviderUrl: networkMetadata.broviderUrl
       });
