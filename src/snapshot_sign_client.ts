@@ -15,7 +15,7 @@ import {
   voteString2Types,
   voteStringTypes,
   voteTypes
-} from "@snapshot-labs/snapshot.js/src/sign/types";
+} from "./utils/sign_types";
 import Client from "@snapshot-labs/snapshot.js/dist/src/sign";
 import { fetchRequest } from "./utils/util";
 import { ISigner } from "@open-social-protocol/osp-wallet-core";

@@ -33,7 +33,6 @@ describe("Test SnapShot Sign Client", () => {
   global.createBoost = true;
 
   it("CreateSpace Or UpdateSpace", async () => {
-    return;
     const settings_json = {
       name: "Butter.OSP",
       network: "204",
@@ -53,12 +52,11 @@ describe("Test SnapShot Sign Client", () => {
       },
       strategies: [
         {
-          name: "erc20-balance-of",
-          network: "56",
+          name: "ticket",
+          network: "204",
           params: {
-            symbol: "Butter",
-            address: "0x5867CBf2A3fA758C063e8A2deeAF0De8d71C3eF4",
-            decimals: 18
+            value: 1,
+            symbol: "Ticket"
           }
         }
       ],
