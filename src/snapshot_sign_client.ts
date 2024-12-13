@@ -2,12 +2,24 @@ import snapshot from "@snapshot-labs/snapshot.js";
 import { Web3Provider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
 import {
+  cancelProposal2Types,
+  cancelProposalTypes,
   Proposal,
   ProposalType,
-  Vote
+  proposalTypes,
+  spaceTypes,
+  Vote,
+  vote2Types,
+  voteArray2Types,
+  voteArrayTypes,
+  voteString2Types,
+  voteStringTypes,
+  voteTypes
 } from "@snapshot-labs/snapshot.js/src/sign/types";
 import Client from "@snapshot-labs/snapshot.js/dist/src/sign";
 import { fetchRequest } from "./utils/util";
+import { ISigner } from "@open-social-protocol/osp-wallet-core";
+import { getAddress } from "@ethersproject/address";
 
 /**
  * Follow type
@@ -17,6 +29,18 @@ export enum FollowType {
   UNFOLLOW = "unfollow"
 }
 
+const NAME = "snapshot";
+const VERSION = "0.1.4";
+
+export const domain: {
+  name: string;
+  version: string;
+  chainId?: number;
+} = {
+  name: NAME,
+  version: VERSION
+  // chainId: 1
+};
 /**
  * Sign response result
  * @param id string
@@ -81,6 +105,7 @@ export class SnapShotSignClient {
   private signClient: Client;
   private sequencerUrl: string;
   private apiKey: string;
+  private sequencerUrlWithApiKey: string;
 
   /**
    * Initialize the client
@@ -93,6 +118,22 @@ export class SnapShotSignClient {
     );
     this.sequencerUrl = sequencerUrl;
     this.apiKey = apiKey;
+    this.sequencerUrlWithApiKey = `${sequencerUrl}?${apiKey ? `apiKey=${apiKey}` : ""}`;
+  }
+
+  /**
+   * Check if the web3 is OSP ISigner
+   * @param web3
+   * @returns
+   */
+  private isISigner(web3: Web3Provider | Wallet | ISigner): web3 is ISigner {
+    return (
+      typeof web3 === "object" &&
+      web3 !== null &&
+      "getAddress" in web3 &&
+      "signMessage" in web3 &&
+      "signTypedData" in web3
+    );
   }
 
   /**
@@ -104,7 +145,7 @@ export class SnapShotSignClient {
    * @returns
    */
   async signCreateOrUpdateSpace(
-    web3: Web3Provider | Wallet,
+    web3: Web3Provider | Wallet | ISigner,
     address: string,
     spaceId: string,
     settings: any
@@ -112,10 +153,24 @@ export class SnapShotSignClient {
     let result: ResponseData;
     try {
       snapshot.utils.validateSchema(snapshot.schemas.space, settings);
-      const message = await this.signClient.space(web3, address, {
-        space: spaceId,
-        settings: JSON.stringify(settings)
-      });
+      let message;
+      if (this.isISigner(web3)) {
+        message = await this.sign(
+          web3,
+          address,
+          {
+            space: spaceId,
+            settings: JSON.stringify(settings)
+          },
+          spaceTypes
+        );
+      } else {
+        message = await this.signClient.space(web3, address, {
+          space: spaceId,
+          settings: JSON.stringify(settings)
+        });
+      }
+
       result = {
         code: 200,
         data: message as Message
@@ -137,7 +192,7 @@ export class SnapShotSignClient {
    * @returns
    */
   async signCreateProposal(
-    web3: Web3Provider | Wallet,
+    web3: Web3Provider | Wallet | ISigner,
     address: string,
     params: CreateProposalPrams
   ): Promise<ResponseData> {
@@ -150,7 +205,14 @@ export class SnapShotSignClient {
         labels: [],
         plugins: JSON.stringify({})
       };
-      const message = await this.signClient.proposal(web3, address, proposal);
+      let message;
+      if (this.isISigner(web3)) {
+        if (!proposal.app) proposal.app = "";
+        if (!proposal.privacy) proposal.privacy = "";
+        message = await this.sign(web3, address, proposal, proposalTypes);
+      } else {
+        message = await this.signClient.proposal(web3, address, proposal);
+      }
       result = {
         code: 200,
         data: message as Message
@@ -163,7 +225,6 @@ export class SnapShotSignClient {
     }
     return result;
   }
-
   /**
    * Sign delete proposal
    * @param web3
@@ -173,17 +234,31 @@ export class SnapShotSignClient {
    * @returns
    */
   async signDeleteProposal(
-    web3: Web3Provider | Wallet,
+    web3: Web3Provider | Wallet | ISigner,
     address: string,
     spaceId: string,
     proposalId: string
   ): Promise<ResponseData> {
     let result: ResponseData;
     try {
-      const message = await this.signClient.cancelProposal(web3, address, {
-        space: spaceId,
-        proposal: proposalId
-      });
+      let message;
+      if (this.isISigner(web3)) {
+        const type2 = message.proposal.startsWith("0x");
+        message = await this.sign(
+          web3,
+          address,
+          {
+            space: spaceId,
+            proposal: proposalId
+          },
+          type2 ? cancelProposal2Types : cancelProposalTypes
+        );
+      } else {
+        message = await this.signClient.cancelProposal(web3, address, {
+          space: spaceId,
+          proposal: proposalId
+        });
+      }
       result = {
         code: 200,
         data: message as Message
@@ -205,13 +280,37 @@ export class SnapShotSignClient {
    * @returns
    */
   async signCreateVote(
-    web3: Web3Provider | Wallet,
+    web3: Web3Provider | Wallet | ISigner,
     address: string,
     params: CreateVotePrams
   ): Promise<ResponseData> {
     let result: ResponseData;
     try {
-      const message = await this.signClient.vote(web3, address, params);
+      let message;
+      if (this.isISigner(web3)) {
+        const vote_message = params as any;
+        const isShutter = vote_message?.privacy === "shutter";
+        if (!vote_message.reason) vote_message.reason = "";
+        if (!vote_message.app) vote_message.app = "";
+        if (!vote_message.metadata) vote_message.metadata = "{}";
+        const type2 = vote_message.proposal.startsWith("0x");
+        let type = type2 ? vote2Types : voteTypes;
+        if (["approval", "ranked-choice"].includes(vote_message.type))
+          type = type2 ? voteArray2Types : voteArrayTypes;
+        if (
+          !isShutter &&
+          ["quadratic", "weighted"].includes(vote_message.type)
+        ) {
+          type = type2 ? voteString2Types : voteStringTypes;
+          vote_message.choice = JSON.stringify(vote_message.choice);
+        }
+        if (isShutter) type = type2 ? voteString2Types : voteStringTypes;
+        delete vote_message.privacy;
+        delete vote_message.type;
+        message = await this.sign(web3, address, vote_message, type);
+      } else {
+        message = await this.signClient.vote(web3, address, params);
+      }
       result = {
         code: 200,
         data: message as Message
@@ -317,5 +416,43 @@ export class SnapShotSignClient {
       console.log("error:", error);
       return false;
     }
+  }
+
+  async sign(signer: ISigner, address: string, message, types) {
+    const checksumAddress = getAddress(address);
+    message.from = message.from ? getAddress(message.from) : checksumAddress;
+    if (!message.timestamp)
+      message.timestamp = parseInt((Date.now() / 1e3).toFixed());
+
+    const domainData = {
+      ...domain
+    };
+    // domainData.chainId = chainId;
+    const data: any = { domain: domainData, types, message };
+    const sig = await signer.signTypedData(domainData, data.types, message);
+    return await this.send({ address: checksumAddress, sig, data });
+  }
+
+  async send(envelop) {
+    const address = this.sequencerUrlWithApiKey;
+
+    const init = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(envelop)
+    };
+    return new Promise((resolve, reject) => {
+      fetch(address, init)
+        .then((res) => {
+          if (res.ok) return resolve(res.json());
+          if (res.headers.get("content-type")?.includes("application/json"))
+            return res.json().then(reject).catch(reject);
+          throw res;
+        })
+        .catch(reject);
+    });
   }
 }
