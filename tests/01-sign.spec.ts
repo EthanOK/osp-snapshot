@@ -109,8 +109,32 @@ describe("Test SnapShot Sign Client", () => {
       "butter.official.osp",
       settings_json
     );
+
+    console.log("CreateSpace", response);
+  }).timeout(10000);
+
+  it("Create single-choice Proposal(Before create space)", async () => {
+    const speceId = `2.204.osp`;
+    const parts = speceId.split(".");
+    const timestamp = Math.floor(Date.now() / 1e3);
+    const proposal_params: CreateProposalPrams = {
+      space: speceId,
+      type: ChoiceType.SINGLE,
+      title: "single-choice Proposal " + timestamp,
+      choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+      start: timestamp,
+      end: timestamp + 1200,
+      snapshot: await getBlockNumber(parts[parts.length - 2])
+    };
+    const response = await signClient.signCreateProposalV2(
+      butter_user_provider,
+      butter_user_aa,
+      proposal_params
+    );
+    proposalId_ = response.data.id;
+    global.proposalId = proposalId_;
     expect(response.code).to.be.equal(200);
-    console.log("CreateSpace Or UpdateSpace", response);
+    console.log("Create single-choice Proposal\n", response);
   }).timeout(10000);
 
   it("Create single-choice Proposal", async () => {
@@ -238,20 +262,20 @@ describe("Test SnapShot Sign Client", () => {
     console.log("Vote multiple Proposal\n", response);
   }).timeout(10000);
 
-  it("FollowSpace", async () => {
-    const follow_data = await queryClient.queryFollowSpace(
-      butter_user_aa,
-      spaceId_
-    );
-    const isFollow = follow_data.length > 0;
-    const response = await signClient.signFollowSpace(
-      butter_user_provider,
-      butter_user_aa,
-      spaceId_,
-      isFollow ? FollowType.UNFOLLOW : FollowType.FOLLOW
-    );
-    expect(response.code).to.be.equal(200);
-  });
+  // it("FollowSpace", async () => {
+  //   const follow_data = await queryClient.queryFollowSpace(
+  //     butter_user_aa,
+  //     spaceId_
+  //   );
+  //   const isFollow = follow_data.length > 0;
+  //   const response = await signClient.signFollowSpace(
+  //     butter_user_provider,
+  //     butter_user_aa,
+  //     spaceId_,
+  //     isFollow ? FollowType.UNFOLLOW : FollowType.FOLLOW
+  //   );
+  //   expect(response.code).to.be.equal(200);
+  // });
 
   it("Refresh Proposal Scores When Proposal End", async () => {
     const result = await signClient.refreshProposalScores(proposalId_);

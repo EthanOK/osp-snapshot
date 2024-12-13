@@ -184,6 +184,111 @@ export class SnapShotSignClient {
     return result;
   }
 
+  async getOspJoinNFTBySpaceId(spaceId: string) {
+    try {
+      const url = `${this.sequencerUrl}/getOspJoinNFTBySpaceId/${spaceId}?${
+        this.apiKey ? `apiKey=${this.apiKey}` : ""
+      }`;
+      const response = await fetchRequest(url);
+      if (response.code !== 200) return null;
+      return {
+        createSpace: response.createSpace as boolean,
+        joinNFT: response.joinNFT as string,
+        chainId: response.chainId as string,
+        existSpace: response.existSpace as boolean
+      };
+    } catch (error) {
+      console.log("error:", error);
+      return null;
+    }
+  }
+
+  private async createSpace(
+    web3: Web3Provider | Wallet | ISigner,
+    account: string,
+    spaceId: string,
+    ospJoinNFT: string,
+    chainId: string
+  ) {
+    const settings_json = {
+      name: spaceId.toUpperCase(),
+      network: chainId,
+      symbol: "Ticket",
+      twitter: "",
+      website: "",
+      private: false,
+      admins: [],
+      moderators: [],
+      members: [],
+      categories: ["service"],
+      labels: [],
+      plugins: {},
+      children: [],
+      voting: {
+        hideAbstain: false
+      },
+      strategies: [
+        {
+          name: "ticket",
+          network: chainId,
+          params: {
+            value: 1,
+            symbol: "Ticket"
+          }
+        }
+      ],
+      validation: {
+        name: "basic",
+        params: {
+          minScore: 1,
+          strategies: [
+            {
+              name: "erc721",
+              params: {
+                symbol: "OSPJ",
+                address: ospJoinNFT
+              },
+              network: chainId
+            }
+          ]
+        }
+      },
+      voteValidation: {
+        name: "basic",
+        params: {
+          minScore: 1,
+          strategies: [
+            {
+              name: "erc721",
+              params: {
+                symbol: "OSPJ",
+                address: ospJoinNFT
+              },
+              network: chainId
+            }
+          ]
+        }
+      },
+      filters: {
+        minScore: 0,
+        onlyMembers: false
+      },
+      treasuries: [],
+      boost: {
+        enabled: true,
+        bribeEnabled: false
+      }
+    };
+
+    const response = await this.signCreateOrUpdateSpace(
+      web3,
+      account,
+      spaceId,
+      settings_json
+    );
+    return response;
+  }
+
   /**
    * Sign create proposal
    * @param web3
@@ -225,6 +330,61 @@ export class SnapShotSignClient {
     }
     return result;
   }
+
+  /**
+   * Sign create proposal v2 create space if not exist
+   * @param web3
+   * @param address
+   * @param message
+   * @returns
+   */
+  async signCreateProposalV2(
+    web3: Web3Provider | Wallet | ISigner,
+    address: string,
+    params: CreateProposalPrams
+  ): Promise<ResponseData> {
+    let result: ResponseData;
+    try {
+      const ospJoinNFTData = await this.getOspJoinNFTBySpaceId(params.space);
+
+      if (ospJoinNFTData && !ospJoinNFTData.existSpace) {
+        const response = await this.createSpace(
+          web3,
+          address,
+          params.space,
+          ospJoinNFTData.joinNFT,
+          ospJoinNFTData.chainId
+        );
+        console.log("createSpace:", params.space);
+      }
+      const proposal: Proposal = {
+        ...params,
+        body: "",
+        discussion: "",
+        labels: [],
+        plugins: JSON.stringify({})
+      };
+      let message;
+      if (this.isISigner(web3)) {
+        if (!proposal.app) proposal.app = "";
+        if (!proposal.privacy) proposal.privacy = "";
+        message = await this.sign(web3, address, proposal, proposalTypes);
+      } else {
+        message = await this.signClient.proposal(web3, address, proposal);
+      }
+      result = {
+        code: 200,
+        data: message as Message
+      };
+    } catch (error) {
+      result = {
+        code: 400,
+        error: error.error_description
+      };
+    }
+    return result;
+  }
+
   /**
    * Sign delete proposal
    * @param web3
