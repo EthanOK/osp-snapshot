@@ -371,6 +371,8 @@ export const USER_VOTED_PROPOSAL_IDS_QUERY = gql`
   query Votes($voter: String!, $proposals: [String]!) {
     votes(first: 1000, where: { voter: $voter, proposal_in: $proposals }) {
       choice
+      vp
+      vp_by_strategy
       proposal {
         id
         choices

@@ -32,7 +32,7 @@ describe("Test SnapShot GraphQL Client", () => {
     const proposals = await queryClient.queryProposals({
       spaceIds: [spaceId_],
       first: 10,
-      state: ProposalState.ACTIVE,
+      state: ProposalState.ALL,
       // voter_not: "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d",
       orderBy: "votes"
     });
@@ -54,8 +54,8 @@ describe("Test SnapShot GraphQL Client", () => {
     const votes = await queryClient.queryUserVotedProposalIds(
       "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d",
       [
-        "0xcacf444efdbc97e1414e134c096114261e78efd64cdbf43b426c26dd0c28c202",
-        "0x65a718112a3a5a669b5749c35163e1fa2d899f070b88a107ce02adbe9903b8e3",
+        "0x8a86e6ed918e2d6126ae2d2a183ffcb32d56f454183430d81e5a306105134854",
+        "0xf1ddac876a8a1a4db0210a35001e5675a238adeebd6c78171df8315c9ffbe29a",
         "0x94d666bcd3b03eed47368a8672bc09051d7e2ea4c30cad7fbff0964d90aa9d69"
       ]
     );
@@ -99,7 +99,6 @@ describe("Test SnapShot GraphQL Client", () => {
 
   it("queryFollowSpace", async () => {
     const data = await queryClient.queryFollowSpace(voter_);
-    console.log(data);
     for (const item of data) {
       console.log("follow space:", item.space.id);
     }
