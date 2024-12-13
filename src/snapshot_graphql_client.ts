@@ -45,12 +45,13 @@ export interface QuerySpacesRankingsParams {
  * @param title_contains
  */
 export interface QueryProposalParam {
-  spaceIds: string[];
+  spaceIds?: string[];
   state: ProposalState;
   first?: number;
   voter_not?: string;
   title_contains?: string;
   orderBy?: string;
+  ids?: string[];
   orderDirection?: "asc" | "desc";
 }
 
@@ -165,6 +166,7 @@ export class SnapShotGraphQLClient {
           first: params.first || 6,
           skip,
           space_in: params.spaceIds,
+          id_in: params.ids,
           state: params.state,
           title_contains: params.title_contains,
           flagged: false,

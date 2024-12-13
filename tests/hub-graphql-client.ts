@@ -1,27 +1,21 @@
-import { ScoreClient, SnapShotGraphQLClient } from "../src";
+import { ProposalState, ScoreClient, SnapShotGraphQLClient } from "../src";
+import { hubUrl } from "./config";
 
 async function main() {
   const hub_URL = "http://localhost:3000";
-  const score_URL = "http://localhost:3003";
-  const queryClient = new SnapShotGraphQLClient(hub_URL, "osp_snapshot_apiKey");
-  const scoreClient = new ScoreClient(score_URL, "osp_snapshot_apiKey");
+  const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
 
   try {
-    const proposal = await queryClient.queryProposal(
-      "0x214288542f501685317f4d4cfb8c17f3ff84b52c4e1766096736e12251ab3613"
-    );
-    console.log(proposal);
-
-    const account = "0x6278A1E803A76796a3A1f7F6344fE874ebfe94B2";
-
-    const validate = await scoreClient.proposalValidate(
-      proposal.validation,
-      proposal.strategies,
-      account,
-      proposal.network,
-      proposal.space.id
-    );
-    console.log("validate", validate);
+    const proposals = await queryClient.queryProposals({
+      ids: [
+        "0xf1ddac876a8a1a4db0210a35001e5675a238adeebd6c78171df8315c9ffbe29a",
+        "0xfc5f3b66957792cf490721a3410888ccfdbe33d45f6647f46e494726f09dff13",
+        "0x00bff8eb6350c44c87d2e44caf112afbc23a88d04994f65380830a49378d6f57"
+      ],
+      first: 10,
+      state: ProposalState.ALL
+    });
+    console.log(proposals);
   } catch (error) {
     console.log(error);
   }

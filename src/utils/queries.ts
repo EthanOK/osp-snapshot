@@ -89,6 +89,7 @@ export const PROPOSALS_QUERY = gql`
     $skip: Int!
     $state: String!
     $space: String
+    $id_in: [String]
     $space_in: [String]
     $author_in: [String]
     $voter: String
@@ -112,6 +113,7 @@ export const PROPOSALS_QUERY = gql`
         title_contains: $title_contains
         space_verified: $space_verified
         flagged: $flagged
+        id_in: $id_in
       }
       orderBy: $orderBy
       orderDirection: $orderDirection
