@@ -87,7 +87,7 @@ export const getOspJoinNFT = async (handle: string) => {
 
   return {
     chainId,
-    ospJoinNFT: ZERO_ADDRESS
+    ospJoinNFT: ospJoinNFT
   };
 };
 const getJoinContractAddress = async (tribeId: string, chainId: string, contract: string) => {
