@@ -1,6 +1,7 @@
 import snapshot from "@snapshot-labs/snapshot.js";
 import { Web3Provider } from "@ethersproject/providers";
 import { Wallet } from "@ethersproject/wallet";
+
 import {
   cancelProposal2Types,
   cancelProposalTypes,
@@ -190,16 +191,27 @@ export class SnapShotSignClient {
         this.apiKey ? `apiKey=${this.apiKey}` : ""
       }`;
       const response = await fetchRequest(url);
-      if (response.code !== 200) return null;
-      return {
-        createSpace: response.createSpace as boolean,
-        joinNFT: response.joinNFT as string,
-        chainId: response.chainId as string,
-        existSpace: response.existSpace as boolean
-      };
+      if (response.code == 200)
+        return {
+          code: 200,
+          data: {
+            createSpace: response.createSpace as boolean,
+            joinNFT: response.joinNFT as string,
+            chainId: response.chainId as string,
+            existSpace: response.existSpace as boolean
+          }
+        };
+      else
+        return {
+          code: response.code as number,
+          error: (response?.message as string) || "error message"
+        };
     } catch (error) {
       console.log("error:", error);
-      return null;
+      return {
+        code: 400,
+        error: error?.error || "unknown error"
+      };
     }
   }
 
@@ -209,7 +221,7 @@ export class SnapShotSignClient {
     spaceId: string,
     ospJoinNFT: string,
     chainId: string
-  ) {
+  ): Promise<ResponseData> {
     const settings_json = {
       name: spaceId.toUpperCase(),
       network: chainId,
@@ -345,17 +357,33 @@ export class SnapShotSignClient {
   ): Promise<ResponseData> {
     let result: ResponseData;
     try {
-      const ospJoinNFTData = await this.getOspJoinNFTBySpaceId(params.space);
+      const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+      const response_osp = await this.getOspJoinNFTBySpaceId(params.space);
+      if (
+        response_osp.code === 400 ||
+        response_osp.data?.joinNFT == ZERO_ADDRESS
+      ) {
+        return {
+          code: 400,
+          error:
+            response_osp.code === 400 ? response_osp.error : "Tribe not exist"
+        };
+      }
 
-      if (ospJoinNFTData && !ospJoinNFTData.existSpace) {
+      if (response_osp.code === 200 && response_osp.data?.createSpace) {
         const response = await this.createSpace(
           web3,
           address,
           params.space,
-          ospJoinNFTData.joinNFT,
-          ospJoinNFTData.chainId
+          response_osp.data.joinNFT,
+          response_osp.data.chainId
         );
-        console.log("createSpace:", params.space);
+        if (response.code !== 200) {
+          return {
+            code: response.code,
+            error: "create space: " + response.error
+          };
+        }
       }
       const proposal: Proposal = {
         ...params,
