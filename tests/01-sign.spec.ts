@@ -14,12 +14,15 @@ import { assert, expect } from "chai";
 import { Wallet } from "@ethersproject/wallet";
 import dotenv from "dotenv";
 import { butterSpaceId, hubUrl, sequencerUrl } from "./config";
+import { OSPWallet } from "./ospWallet";
 dotenv.config();
 
 describe("Test SnapShot Sign Client", () => {
   const spaceOwner_provider = new Wallet(process.env.PRIVATE_KEY_SIGNATURE!);
   const spaceOwner = spaceOwner_provider.address;
-  const butter_user_provider = new Wallet(process.env.PRIVATE_KEY_WEB3AUTH);
+  const butter_user_provider = new OSPWallet(
+    new Wallet(process.env.PRIVATE_KEY_WEB3AUTH)
+  );
   const butter_user_aa = "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d";
 
   const signClient = new SnapShotSignClient(
