@@ -1,5 +1,7 @@
 import snapshot from '@snapshot-labs/snapshot.js';
 import redisClient from './helpers/redis';
+import { Contract } from '@ethersproject/contracts';
+import log from './helpers/log';
 
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
 
@@ -62,25 +64,25 @@ export const getOspJoinNFT = async (handle: string) => {
     }
     contract = OSPContractMap.prod;
   }
-  if (tribeId && chainId && contract) {
-    const key = `osp:${tribeId}:${chainId}:${contract}`;
-    if (redisClient?.isReady) {
-      const cached = await redisClient.get(key);
-      if (cached) {
-        return {
-          chainId,
-          ospJoinNFT: cached
-        };
-      }
+
+  if (!tribeId || !chainId || !contract) {
+    return Promise.reject('Invalid input parameters');
+  }
+
+  const key = `osp:${tribeId}:${chainId}:${contract}`;
+  log.info(`[getOspJoinNFT] key: ${key}`);
+  if (redisClient?.isReady) {
+    const ospJoinNFT = await redisClient.get(key);
+    if (ospJoinNFT && ospJoinNFT !== ZERO_ADDRESS) {
+      return {
+        chainId,
+        ospJoinNFT: ospJoinNFT
+      };
     }
-    const joinContractAddress = await getJoinContractAddress(tribeId, chainId, contract);
-    if (redisClient?.isReady) {
-      await redisClient.set(key, joinContractAddress);
-    }
-    return {
-      chainId,
-      ospJoinNFT: joinContractAddress
-    };
+  }
+  const ospJoinNFT = await getJoinContractAddress(tribeId, chainId, contract);
+  if (redisClient?.isReady && ospJoinNFT !== ZERO_ADDRESS) {
+    await redisClient.set(key, ospJoinNFT);
   }
 
   return {
@@ -91,15 +93,13 @@ export const getOspJoinNFT = async (handle: string) => {
 const getJoinContractAddress = async (tribeId: string, chainId: string, contract: string) => {
   try {
     const provider = snapshot.utils.getProvider(chainId, { broviderUrl });
-    const result = await snapshot.utils.call(
-      provider,
-      [methodABI],
-      [contract, methodABI.name, tribeId]
-    );
+    const ospContract = new Contract(contract, [methodABI], provider);
+    const result = await ospContract.getJoinNFT(tribeId);
     return result as string;
   } catch (error) {
+    console.log('getJoinContractAddress', error);
     return ZERO_ADDRESS;
   }
 };
 
-// validateOspHandle('dev_1_204').then(console.log);
+// getOspJoinNFT('dev_1_204').then(console.log);
