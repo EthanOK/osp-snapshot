@@ -119,6 +119,7 @@ export const PROPOSALS_QUERY = gql`
       orderDirection: $orderDirection
     ) {
       id
+      type
       ipfs
       title
       body
