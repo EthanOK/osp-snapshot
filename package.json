@@ -7,6 +7,7 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
+    "createTables": "ts-node scripts/createTables.ts",
     "dev": "nodemon src/index.ts",
     "start": "node build/src/index.js",
     "start:test": "dotenv -e test/.env.test yarn dev",

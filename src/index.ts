@@ -9,9 +9,10 @@ import refreshModeration from './helpers/moderation';
 import refreshProposals from './helpers/updateProposals';
 import rateLimit from './helpers/rateLimit';
 import shutter from './helpers/shutter';
+import initTables from './helpers/createTables';
 
 const app = express();
-
+initTables();
 initLogger(app);
 refreshModeration();
 refreshProposals();

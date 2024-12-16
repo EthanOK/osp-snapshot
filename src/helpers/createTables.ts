@@ -16,7 +16,7 @@ bluebird.promisifyAll([Pool, Connection]);
 const db = mysql.createPool(config);
 const dbName = config.path[0];
 
-async function run() {
+export default async function run()  {
   const splitToken = ');';
 
   console.log('Start database setup');
@@ -42,14 +42,6 @@ async function run() {
   for (const statement of schema) {
     await db.queryAsync(`${statement}${splitToken}`);
   }
+  return;
 }
 
-(async () => {
-  try {
-    await run();
-    process.exit(0);
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  }
-})();
