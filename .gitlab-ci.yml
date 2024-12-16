@@ -29,3 +29,113 @@ PublishDev:
       else
         # 发布成功
         echo 'publish success ...'
+      fi
+      
+      COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+      echo $COMMIT_MESSAGE
+      export COMMIT_MESSAGE=`echo $COMMIT_MESSAGE | sed -e 's/gitlab.com/g.dipbit.xyz/'`
+      curl -X POST "https://oapi.dingtalk.com/robot/send?access_token=35f822cbb3a9e300005ce7a516ee49f198b1c18495fd77efceda4fc7f09129b2" \
+      -H "Content-type: application/json" \
+      -d "{\"msgtype\": \"markdown\",
+            \"markdown\": {\"title\": \"${CI_PROJECT_PATH}\",
+                          \"text\": \"**项目: ${CI_PROJECT_PATH}**
+                                    \n  **环境**: ${CI_JOB_NAME}
+                                    \n  **时间**: ${BUILD_DATETIME}
+                                    \n  **分支**: ${CI_COMMIT_BRANCH}
+                                    \n  **版本号**: ${VERSION}\
+                                    \n  **提交信息**: ${COMMIT_MESSAGE}\"
+                          }
+          }"
+PublishBeta:
+  only:
+    - /^ospbeta-v[0-9]+.[0-9]+.*$/
+  tags:
+    - trexbeta
+  image: node:18.20.2
+  stage: Publish
+  script:
+    - |
+      echo "@open-social-protocol:registry=https://${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/" > .npmrc
+      echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${NPM_CI_JOB_TOKEN}" >> .npmrc
+      echo "Created the following .npmrc:"; cat .npmrc
+      npm install -g pnpm@7.15.0
+      echo "Installing dependencies..."
+      pnpm install
+      echo "Building and publishing package..."
+      pnpm run build
+      echo "Publishing package..."
+      VERSION=$(pnpm publish -r --no-git-checks|grep "+ @open-social-protocol/snapshot-sdk@") || export PUBLISH_STATUS=false
+      echo "Successfully published package to GitLab's NPM registry"
+      echo $VERSION
+      echo $PUBLISH_STATUS
+      export BUILD_DATETIME=`date +%Y-%m-%d' '%H:%M:%S -d "+8 hours"`
+
+      if [ "${PUBLISH_STATUS}" == "false" ]; then
+        # 发布失败
+        echo 'publish fail ...'
+      else
+        # 发布成功
+        echo 'publish success ...'
+      fi
+      
+      COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+      echo $COMMIT_MESSAGE
+      export COMMIT_MESSAGE=`echo $COMMIT_MESSAGE | sed -e 's/gitlab.com/g.dipbit.xyz/'`
+      curl -X POST "https://oapi.dingtalk.com/robot/send?access_token=32db1be88ec385374a72cf2d4cf8032d87711c8ded867e26ec32f10c4acd2323" \
+      -H "Content-type: application/json" \
+      -d "{\"msgtype\": \"markdown\",
+            \"markdown\": {\"title\": \"${CI_PROJECT_PATH}\",
+                          \"text\": \"**项目: ${CI_PROJECT_PATH}**
+                                    \n  **环境**: ${CI_JOB_NAME}
+                                    \n  **时间**: ${BUILD_DATETIME}
+                                    \n  **分支**: ${CI_COMMIT_BRANCH}
+                                    \n  **版本号**: ${VERSION}\
+                                    \n  **提交信息**: ${COMMIT_MESSAGE}\"
+                          }
+          }"
+PublishMaster:
+  only:
+    - /^ospmaster-v[0-9]+.[0-9]+.*$/
+  tags:
+    - trexprod
+  image: node:18.20.2
+  stage: Publish
+  script:
+    - |
+      echo "//registry.npmjs.org/:_authToken=\${MASTER_CI_JOB_TOKEN}" > .npmrc && chmod 600 .npmrc
+      echo "Created the following .npmrc:"; cat .npmrc
+      npm install -g pnpm@7.15.0
+      echo "Installing dependencies..."
+      pnpm install
+      echo "Building and publishing package..."
+      pnpm run build
+      echo "Publishing package..."
+      VERSION=$(pnpm publish -r --no-git-checks|grep "+ @open-social-protocol/snapshot-sdk@") || export PUBLISH_STATUS=false
+      echo "Successfully published package to GitLab's NPM registry"
+      echo $VERSION
+      echo $PUBLISH_STATUS
+      export BUILD_DATETIME=`date +%Y-%m-%d' '%H:%M:%S -d "+8 hours"`
+
+      if [ "${PUBLISH_STATUS}" == "false" ]; then
+        # 发布失败
+        echo 'publish fail ...'
+      else
+        # 发布成功
+        echo 'publish success ...'
+      fi
+      
+      COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+      echo $COMMIT_MESSAGE
+      export COMMIT_MESSAGE=`echo $COMMIT_MESSAGE | sed -e 's/gitlab.com/g.dipbit.xyz/'`
+      curl -X POST "https://oapi.dingtalk.com/robot/send?access_token=32db1be88ec385374a72cf2d4cf8032d87711c8ded867e26ec32f10c4acd2323" \
+      -H "Content-type: application/json" \
+      -d "{\"msgtype\": \"markdown\",
+            \"markdown\": {\"title\": \"${CI_PROJECT_PATH}\",
+                          \"text\": \"**项目: ${CI_PROJECT_PATH}**
+                                    \n  **环境**: ${CI_JOB_NAME}
+                                    \n  **时间**: ${BUILD_DATETIME}
+                                    \n  **分支**: ${CI_COMMIT_BRANCH}
+                                    \n  **版本号**: ${VERSION}\
+                                    \n  **提交信息**: ${COMMIT_MESSAGE}\"
+                          }
+          }"

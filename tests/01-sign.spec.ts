@@ -116,13 +116,13 @@ describe("Test SnapShot Sign Client", () => {
     console.log("CreateSpace", response);
   }).timeout(10000);
 
-  it("Create single-choice Proposal(Before create space)", async () => {
+  it("Create multiple-choice Proposal And Vote(Before create space)", async () => {
     const speceId = `425.204.osp`;
     const parts = speceId.split(".");
     const timestamp = Math.floor(Date.now() / 1e3);
     const proposal_params: CreateProposalPrams = {
       space: speceId,
-      type: ChoiceType.SINGLE,
+      type: ChoiceType.MULTIPLE,
       title: "single-choice Proposal " + timestamp,
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       start: timestamp,
@@ -134,11 +134,25 @@ describe("Test SnapShot Sign Client", () => {
       butter_user_aa,
       proposal_params
     );
-    console.log("Create single-choice Proposal\n", response);
+    console.log("Create multiple-choice Proposal\n", response);
     if (response.code == 200) {
       proposalId_ = response.data.id;
       global.proposalId = proposalId_;
     }
+
+    const vote_message: CreateVotePrams = {
+      space: speceId,
+      proposal: proposalId_,
+      type: ChoiceType.MULTIPLE,
+      choice: [1, 2]
+    };
+
+    const response_ = await signClient.signCreateVote(
+      butter_user_provider,
+      butter_user_aa,
+      vote_message
+    );
+    console.log("Vote multiple-choice\n", response_);
   }).timeout(10000);
 
   it("Create single-choice Proposal", async () => {
