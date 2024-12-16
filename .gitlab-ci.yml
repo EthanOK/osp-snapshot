@@ -13,6 +13,7 @@ PublishDev:
       echo "Created the following .npmrc:"; cat .npmrc
       npm install -g pnpm@7.15.0
       echo "Installing dependencies..."
+      echo ${DEV_CI_JOB_TOKEN}
       pnpm install
       echo "Building and publishing package..."
       pnpm run build
