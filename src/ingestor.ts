@@ -15,6 +15,7 @@ import { flaggedIps } from './helpers/moderation';
 import relayer, { issueReceipt } from './helpers/relayer';
 import { getIp, jsonParse, sha256 } from './helpers/utils';
 import writer from './writer';
+import { createOspSpace } from './osp';
 
 const NETWORK_METADATA = {
   evm: {
@@ -96,8 +97,15 @@ export default async function ingestor(req) {
       if (!message.space) return Promise.reject('unknown space');
 
       try {
-        const space = await getSpace(message.space, false, message.network);
-        if (!space) return Promise.reject('unknown space');
+        let space = await getSpace(message.space, false, message.network);
+        if (!space) {
+          if (type === 'proposal') {
+            await createOspSpace(message.space);
+            space = await getSpace(message.space, false, message.network);
+          } else {
+            return Promise.reject('unknown space');
+          }
+        }
         network = space.network;
         if (space.voting?.aliased) aliased = true;
       } catch (e: any) {

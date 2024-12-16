@@ -2,6 +2,7 @@ import snapshot from '@snapshot-labs/snapshot.js';
 import redisClient from './helpers/redis';
 import { Contract } from '@ethersproject/contracts';
 import log from './helpers/log';
+import { addOrUpdateSpace } from './helpers/actions';
 
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
 
@@ -39,15 +40,15 @@ export const OSPContractMap = {
 // TODO: dev_1_1 or beta_1_1 or pre_1_1 or 1_1
 /**
  *
- * @param handle
+ * @param spaceId
  * @returns
  */
-export const getOspJoinNFT = async (handle: string) => {
+export const getOspJoinNFT = async (spaceId: string) => {
   const regex = /^((dev|beta|pre)\.\d+\.\d+|\d+(.\d+)?)\.osp$/;
-  if (!regex.test(handle)) {
+  if (!regex.test(spaceId)) {
     return Promise.reject('Invalid OSP Space Id');
   }
-  const parts = handle.split('.');
+  const parts = spaceId.split('.');
   const prefix = parts[0];
   let contract = '';
   let tribeId = '';
@@ -76,7 +77,7 @@ export const getOspJoinNFT = async (handle: string) => {
     if (ospJoinNFT && ospJoinNFT !== ZERO_ADDRESS) {
       return {
         chainId,
-        ospJoinNFT: ospJoinNFT
+        ospJoinNFT: ospJoinNFT as string
       };
     }
   }
@@ -100,6 +101,95 @@ const getJoinContractAddress = async (tribeId: string, chainId: string, contract
     console.log('getJoinContractAddress', error);
     return ZERO_ADDRESS;
   }
+};
+
+export const createOspSpace = async (spaceId: string) => {
+  const ospJoinNFT = await getOspJoinNFT(spaceId);
+  if (ospJoinNFT.ospJoinNFT === ZERO_ADDRESS) {
+    return Promise.reject('tribe not found');
+  }
+  const settings = await getOspSpaceSettings(spaceId, ospJoinNFT.ospJoinNFT, ospJoinNFT.chainId);
+  try {
+    await addOrUpdateSpace(spaceId, settings);
+  } catch (e) {
+    return Promise.reject("failed create space");
+  }
+  console.log("create osp space", spaceId);
+  return;
+};
+
+export const getOspSpaceSettings = async (spaceId: string, ospJoinNFT: string, chainId: string) => {
+  const settings = {
+    name: spaceId.toUpperCase(),
+    network: chainId,
+    symbol: 'Ticket',
+    twitter: '',
+    website: '',
+    private: false,
+    admins: [],
+    moderators: [],
+    members: [],
+    categories: ['service'],
+    labels: [],
+    plugins: {},
+    children: [],
+    voting: {
+      hideAbstain: false
+    },
+    strategies: [
+      {
+        name: 'ticket',
+        network: chainId,
+        params: {
+          value: 1,
+          symbol: 'Ticket'
+        }
+      }
+    ],
+    validation: {
+      name: 'basic',
+      params: {
+        minScore: 1,
+        strategies: [
+          {
+            name: 'erc721',
+            params: {
+              symbol: 'OSPJ',
+              address: ospJoinNFT
+            },
+            network: chainId
+          }
+        ]
+      }
+    },
+    voteValidation: {
+      name: 'basic',
+      params: {
+        minScore: 1,
+        strategies: [
+          {
+            name: 'erc721',
+            params: {
+              symbol: 'OSPJ',
+              address: ospJoinNFT
+            },
+            network: chainId
+          }
+        ]
+      }
+    },
+    filters: {
+      minScore: 0,
+      onlyMembers: false
+    },
+    treasuries: [],
+    boost: {
+      enabled: true,
+      bribeEnabled: false
+    }
+  };
+
+  return settings;
 };
 
 // getOspJoinNFT('dev_1_204').then(console.log);
