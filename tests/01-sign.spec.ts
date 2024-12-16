@@ -18,19 +18,18 @@ import { OSPWallet } from "./ospWallet";
 dotenv.config();
 
 describe("Test SnapShot Sign Client", () => {
-  const spaceOwner_provider = new Wallet(process.env.PRIVATE_KEY_SIGNATURE!);
-  const spaceOwner = spaceOwner_provider.address;
-  const butter_user_provider = new OSPWallet(
-    new Wallet(process.env.PRIVATE_KEY_WEB3AUTH)
+  const osp_wallet = new OSPWallet(
+    new Wallet(process.env.BETA_SOMON_PRIVATE_KEY!)
   );
-  const butter_user_aa = "0xeb81272ADf2Cdc9620eF2eE8B237497917FaA56d";
+  const osp_aa = process.env.BETA_SOMON_AA!;
+  const osp_spaceId = process.env.BETA_SPACE_ID!;
 
   const signClient = new SnapShotSignClient(
     sequencerUrl,
     "osp_snapshot_apiKey"
   );
   const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
-  const spaceId_ = butterSpaceId;
+  const spaceId_ = osp_spaceId;
   let proposalId_: string;
   let proposalId_multi_: string;
   global.createBoost = true;
@@ -106,73 +105,34 @@ describe("Test SnapShot Sign Client", () => {
       }
     };
 
-    const response = await signClient.signCreateOrUpdateSpace(
-      spaceOwner_provider,
-      spaceOwner,
-      "butter.official.osp",
-      settings_json
-    );
+    // const response = await signClient.signCreateOrUpdateSpace(
+    //   spaceOwner_provider,
+    //   spaceOwner,
+    //   "butter.official.osp",
+    //   settings_json
+    // );
 
-    console.log("CreateSpace", response);
-  }).timeout(10000);
-
-  it("Create multiple-choice Proposal And Vote(Before create space)", async () => {
-    const speceId = `425.204.osp`;
-    const parts = speceId.split(".");
-    const timestamp = Math.floor(Date.now() / 1e3);
-    const proposal_params: CreateProposalPrams = {
-      space: speceId,
-      type: ChoiceType.MULTIPLE,
-      title: "single-choice Proposal " + timestamp,
-      choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
-      start: timestamp,
-      end: timestamp + 1200,
-      snapshot: await getBlockNumber(parts[parts.length - 2])
-    };
-    const response = await signClient.signCreateProposalV2(
-      butter_user_provider,
-      butter_user_aa,
-      proposal_params
-    );
-    console.log("Create multiple-choice Proposal\n", response);
-    if (response.code == 200) {
-      proposalId_ = response.data.id;
-      global.proposalId = proposalId_;
-    }
-
-    const vote_message: CreateVotePrams = {
-      space: speceId,
-      proposal: proposalId_,
-      type: ChoiceType.MULTIPLE,
-      choice: [1, 2]
-    };
-
-    const response_ = await signClient.signCreateVote(
-      butter_user_provider,
-      butter_user_aa,
-      vote_message
-    );
-    console.log("Vote multiple-choice\n", response_);
+    // console.log("CreateSpace", response);
   }).timeout(10000);
 
   it("Create single-choice Proposal", async () => {
-    // const data = await queryClient.querySpace(spaceId_);
-    // const blockNumber = await getBlockNumber(data.network);
     const timestamp = Math.floor(Date.now() / 1e3);
+    const parts = spaceId_.split(".");
 
+    const snapshot = await getBlockNumber(parts[parts.length - 2]);
     const proposal_params: CreateProposalPrams = {
-      space: "beta.1.84532.osp",
+      space: spaceId_,
       type: ChoiceType.SINGLE,
       title: "single-choice Proposal " + timestamp,
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       start: timestamp,
       end: timestamp + 1200,
-      snapshot: 0
+      snapshot: snapshot
     };
 
     const response = await signClient.signCreateProposal(
-      butter_user_provider,
-      butter_user_aa,
+      osp_wallet,
+      osp_aa,
       proposal_params
     );
     console.log("Create single-choice Proposal\n", response);
@@ -197,8 +157,8 @@ describe("Test SnapShot Sign Client", () => {
     };
 
     const response = await signClient.signCreateProposal(
-      butter_user_provider,
-      butter_user_aa,
+      osp_wallet,
+      osp_aa,
       proposal_params
     );
     proposalId_multi_ = response.data.id;
@@ -217,8 +177,8 @@ describe("Test SnapShot Sign Client", () => {
     }
 
     const message = await signClient.signDeleteProposal(
-      butter_user_provider,
-      butter_user_aa,
+      osp_wallet,
+      osp_aa,
       spaceId_,
       prroposals[prroposals.length - 1].id
     );
@@ -234,8 +194,8 @@ describe("Test SnapShot Sign Client", () => {
     };
 
     const response = await signClient.signCreateVote(
-      butter_user_provider,
-      butter_user_aa,
+      osp_wallet,
+      osp_aa,
       vote_message
     );
 
@@ -252,8 +212,8 @@ describe("Test SnapShot Sign Client", () => {
     };
 
     const response = await signClient.signCreateVote(
-      butter_user_provider,
-      butter_user_aa,
+      osp_wallet,
+      osp_aa,
       vote_message
     );
 
@@ -271,8 +231,8 @@ describe("Test SnapShot Sign Client", () => {
     };
 
     const response = await signClient.signCreateVote(
-      butter_user_provider,
-      butter_user_aa,
+      osp_wallet,
+      osp_aa,
       vote_message
     );
 

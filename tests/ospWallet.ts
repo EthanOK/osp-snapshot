@@ -1,5 +1,6 @@
-import { ISigner } from "@open-social-protocol/osp-wallet-core";
 import { Wallet } from "@ethersproject/wallet";
+import { ISigner } from "../src/utils/osp_signer";
+
 export class OSPWallet implements ISigner {
   wallet: Wallet;
 
