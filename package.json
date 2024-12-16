@@ -21,7 +21,6 @@
   ],
   "dependencies": {
     "@apollo/client": "^3.11.10",
-    "@open-social-protocol/osp-wallet-core": "latest",
     "@snapshot-labs/snapshot.js": "^0.12.28"
   },
   "devDependencies": {

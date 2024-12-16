@@ -19,8 +19,8 @@ import {
 } from "./utils/sign_types";
 import Client from "@snapshot-labs/snapshot.js/dist/src/sign";
 import { fetchRequest } from "./utils/util";
-import { ISigner } from "@open-social-protocol/osp-wallet-core";
 import { getAddress } from "@ethersproject/address";
+import { ISigner } from "./utils/osp_signer";
 
 /**
  * Follow type
