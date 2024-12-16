@@ -322,6 +322,21 @@ export class SnapShotSignClient {
         labels: [],
         plugins: JSON.stringify({})
       };
+      const spaceId = proposal.space;
+      const regex = /^((dev|beta|pre)\.\d+\.\d+|\d+(.\d+)?)\.osp$/;
+      if (!regex.test(spaceId)) {
+        return {
+          code: 400,
+          error: "Invalid OSP Space Id"
+        };
+      }
+      console.log("before spaceId:", proposal.space);
+      if (spaceId.startsWith("dev")) {
+        proposal.space = "dev.somon.official.osp";
+      } else if (spaceId.startsWith("beta")) {
+        proposal.space = "beta.somon.official.osp";
+      }
+      console.log("after spaceId:", proposal.space);
       let message;
       if (this.isISigner(web3)) {
         if (!proposal.app) proposal.app = "";

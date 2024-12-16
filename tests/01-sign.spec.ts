@@ -156,18 +156,18 @@ describe("Test SnapShot Sign Client", () => {
   }).timeout(10000);
 
   it("Create single-choice Proposal", async () => {
-    const data = await queryClient.querySpace(spaceId_);
-    const blockNumber = await getBlockNumber(data.network);
+    // const data = await queryClient.querySpace(spaceId_);
+    // const blockNumber = await getBlockNumber(data.network);
     const timestamp = Math.floor(Date.now() / 1e3);
 
     const proposal_params: CreateProposalPrams = {
-      space: spaceId_,
+      space: "beta.1.84532.osp",
       type: ChoiceType.SINGLE,
       title: "single-choice Proposal " + timestamp,
       choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
       start: timestamp,
       end: timestamp + 1200,
-      snapshot: blockNumber
+      snapshot: 0
     };
 
     const response = await signClient.signCreateProposal(
@@ -175,10 +175,10 @@ describe("Test SnapShot Sign Client", () => {
       butter_user_aa,
       proposal_params
     );
+    console.log("Create single-choice Proposal\n", response);
     proposalId_ = response.data.id;
     global.proposalId = proposalId_;
     expect(response.code).to.be.equal(200);
-    console.log("Create single-choice Proposal\n", response);
   }).timeout(10000);
 
   it("Create mutiple-choice Proposal", async () => {
