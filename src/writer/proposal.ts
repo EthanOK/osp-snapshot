@@ -159,7 +159,7 @@ export async function verify(body): Promise<any> {
         );
       }
 
-      if (!isValid) return Promise.reject('validation failed');
+      if (!isValid) return Promise.reject('proposal validation failed');
     } catch (e: any) {
       captureError(e, { space: msg.space, address: body.address }, [504]);
       log.warn(
