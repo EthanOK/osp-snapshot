@@ -56,7 +56,7 @@ PublishBeta:
   script:
     - |
       echo "@open-social-protocol:registry=https://${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/" > .npmrc
-      echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${NPM_CI_JOB_TOKEN}" >> .npmrc
+      echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
       echo "Created the following .npmrc:"; cat .npmrc
       npm install -g pnpm@7.15.0
       echo "Installing dependencies..."
