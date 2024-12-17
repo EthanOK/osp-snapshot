@@ -18,7 +18,7 @@ import { Wallet } from "@ethersproject/wallet";
 import dotenv from "dotenv";
 dotenv.config();
 
-const wallet = new Wallet(process.env.PRIVATE_KEY!).connect(
+const wallet = new Wallet(process.env.BOOST_PRIVATE_KEY!).connect(
   getProvider("11155111")
 );
 

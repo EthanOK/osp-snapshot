@@ -1,6 +1,6 @@
 import { ProposalState, ScoreClient, SnapShotGraphQLClient } from "../src";
 import { expect } from "chai";
-import { butterSpaceId, hubUrl, scoreApiUrl } from "./config";
+import { hubUrl, osp_spaceId, scoreApiUrl } from "./config";
 
 describe("Test Score Client", () => {
   const queryClient = new SnapShotGraphQLClient(hubUrl, "osp_snapshot_apiKey");
@@ -25,7 +25,7 @@ describe("Test Score Client", () => {
   });
 
   it("validate account have proposal power", async () => {
-    const space = await queryClient.querySpace(butterSpaceId);
+    const space = await queryClient.querySpace(osp_spaceId);
     const validate = await scoreClient.proposalValidate(
       space.validation,
       space.strategies,
