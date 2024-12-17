@@ -4,8 +4,8 @@ import isEqual from 'lodash/isEqual';
 import { addOrUpdateSpace, getSpace } from '../helpers/actions';
 import log from '../helpers/log';
 import db from '../helpers/mysql';
-import { clearStampCache, DEFAULT_NETWORK, jsonParse } from '../helpers/utils';
-import { getOspJoinNFT, ZERO_ADDRESS } from '../osp';
+import { clearStampCache, jsonParse } from '../helpers/utils';
+import { getOspSpaceOwner } from '../osp';
 
 const SNAPSHOT_ENV = process.env.NETWORK || 'testnet';
 const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
@@ -64,9 +64,9 @@ export async function verify(body): Promise<any> {
   }
   const space = await getSpace(msg.space, true);
 
-  if (space !== false) {
-    return Promise.reject('Space Already Exists');
-  }
+  // if (space !== false) {
+  //   return Promise.reject('Space Already Exists');
+  // }
 
   try {
     await validateSpaceSettings({
@@ -78,12 +78,11 @@ export async function verify(body): Promise<any> {
     return Promise.reject(e);
   }
 
-  // TODO: validate Osp Handle
-  // const isController = await validateOspHandle(body.address, msg.space, msg.payload.network);
-  const ospJoinNFTData = await getOspJoinNFT(msg.space);
-  const isController = ospJoinNFTData.ospJoinNFT !== ZERO_ADDRESS;
+  // TODO: validate Osp SpaceId Owner
+  const spaceOwner = await getOspSpaceOwner(msg.space);
+  const isController = spaceOwner == body.address;
   if (!isController) {
-    return Promise.reject('Tribe Not Found');
+    return Promise.reject('not is space owner');
   }
   const admins = (space?.admins || []).map(admin => admin.toLowerCase());
   const isAdmin = admins.includes(body.address.toLowerCase());

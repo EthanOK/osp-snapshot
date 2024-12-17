@@ -8,26 +8,6 @@ const broviderUrl = process.env.BROVIDER_URL || 'https://rpc.snapshot.org';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export const methodABI = {
-  inputs: [
-    {
-      internalType: 'uint256',
-      name: 'communityId',
-      type: 'uint256'
-    }
-  ],
-  name: 'getJoinNFT',
-  outputs: [
-    {
-      internalType: 'address',
-      name: '',
-      type: 'address'
-    }
-  ],
-  stateMutability: 'view',
-  type: 'function'
-};
-
 export const OSP_CHAIN_IDS = ['8453', '204'];
 
 export const OSPContractMap = {
@@ -37,13 +17,25 @@ export const OSPContractMap = {
   prod: '0x00000066C6C6fCa286F48A7f4E989b7198c26cAf'
 };
 
-// TODO: dev_1_1 or beta_1_1 or pre_1_1 or 1_1
+export const OSPTribeContractMap = {
+  dev: '0x00000062954A785b82fb182D289987bDf29389Ab',
+  beta: '0x000000CBBAAB23381b8a96eA51538bB14B4064cf',
+  pre: '0x0000001B66F42B5797dCE3A44b285813ea53cA88',
+  prod: '0x000000cb792aB2993998DB8C1aB2603FB436FAA0'
+};
+
 /**
+ * Validates the format of a given OSP space ID.
  *
- * @param spaceId
- * @returns
+ * The space ID should follow the format:
+ * - "dev.<number>.<number>.osp", "beta.<number>.<number>.osp", or "pre.<number>.<number>.osp"
+ * - "<number>.osp"
+ *
+ * @param spaceId - The space ID to validate.
+ * @returns A promise that rejects with an error message if the space ID is invalid.
  */
-export const getOspJoinNFT = async (spaceId: string) => {
+
+const validateSpaceId = (spaceId: string, contractMap: any) => {
   const regex = /^((dev|beta|pre)\.\d+\.\d+|\d+(.\d+)?)\.osp$/;
   if (!regex.test(spaceId)) {
     return Promise.reject('Invalid OSP Space Id');
@@ -53,19 +45,24 @@ export const getOspJoinNFT = async (spaceId: string) => {
   let contract = '';
   let tribeId = '';
   let chainId = '';
-  if (parts.length === 4 && prefix in OSPContractMap) {
+  if (parts.length === 4 && prefix in contractMap) {
     tribeId = parts[1];
     chainId = parts[2];
-    contract = OSPContractMap[prefix];
+    contract = contractMap[prefix];
   } else if (parts.length === 3) {
     tribeId = parts[0];
     chainId = parts[1];
     if (!OSP_CHAIN_IDS.includes(chainId)) {
       return Promise.reject('Invalid Chain Id');
     }
-    contract = OSPContractMap.prod;
+    contract = contractMap.prod;
   }
 
+  return { tribeId, chainId, contract };
+};
+
+export const getOspJoinNFT = async (spaceId: string) => {
+  const { tribeId, chainId, contract } = await validateSpaceId(spaceId, OSPContractMap);
   if (!tribeId || !chainId || !contract) {
     return Promise.reject('Invalid input parameters');
   }
@@ -91,14 +88,24 @@ export const getOspJoinNFT = async (spaceId: string) => {
     ospJoinNFT: ospJoinNFT
   };
 };
+
+export const getOspSpaceOwner = async (spaceId: string) => {
+  const { tribeId, chainId, contract } = await validateSpaceId(spaceId, OSPTribeContractMap);
+  if (!tribeId || !chainId || !contract) {
+    return Promise.reject('Invalid input parameters');
+  }
+  const tribeOwner = await getTribeOwner(tribeId, chainId, contract);
+  return tribeOwner;
+};
 const getJoinContractAddress = async (tribeId: string, chainId: string, contract: string) => {
   try {
+    const ospABI = ['function getJoinNFT(uint256 communityId) view returns (address)'];
     const provider = snapshot.utils.getProvider(chainId, { broviderUrl });
-    const ospContract = new Contract(contract, [methodABI], provider);
+    const ospContract = new Contract(contract, ospABI, provider);
     const result = await ospContract.getJoinNFT(tribeId);
     return result as string;
   } catch (error) {
-    console.log('getJoinContractAddress', error);
+   log.warn('getJoinContractAddress error');
     return ZERO_ADDRESS;
   }
 };
@@ -112,9 +119,9 @@ export const createOspSpace = async (spaceId: string) => {
   try {
     await addOrUpdateSpace(spaceId, settings);
   } catch (e) {
-    return Promise.reject("failed create space");
+    return Promise.reject('failed create space');
   }
-  console.log("create osp space", spaceId);
+  log.info(`[createOspSpace] spaceId: ${spaceId}`);
   return;
 };
 
@@ -188,8 +195,22 @@ export const getOspSpaceSettings = async (spaceId: string, ospJoinNFT: string, c
       bribeEnabled: false
     }
   };
-
   return settings;
 };
 
-// getOspJoinNFT('dev_1_204').then(console.log);
+export const getTribeOwner = async (tribeId: string, chainId: string, contract: string) => {
+  try {
+    const tribeABI = ['function ownerOf(uint256 tokenId) view returns (address)'];
+    const provider = snapshot.utils.getProvider(chainId, { broviderUrl });
+    const ospContract = new Contract(contract, tribeABI, provider);
+    const result = await ospContract.ownerOf(tribeId);
+    return result as string;
+  } catch (error) {
+    log.warn('getTribeOwner error');
+    return ZERO_ADDRESS;
+  }
+};
+
+// getOspJoinNFT('beta.69.84532.osp').then(console.log);
+
+// getOspSpaceOwner('beta.395.84532.osp').then(console.log);
