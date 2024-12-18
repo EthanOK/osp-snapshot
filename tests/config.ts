@@ -4,10 +4,10 @@ import { OSPWallet } from "./ospWallet";
 dotenv.config();
 
 // export const sequencerUrl = "http://localhost:3001";
-export const sequencerUrl = "http://snapshot-sequencer.trex.xyz";
+export const sequencerUrl = "https://snapshot-sequencer.trex.xyz";
 // export const hubUrl = "http://localhost:3000";
-export const hubUrl = "http://snapshot-hub.trex.xyz";
-export const scoreApiUrl = "http://score-api.trex.xyz";
+export const hubUrl = "https://snapshot-hub.trex.xyz";
+export const scoreApiUrl = "https://score-api.trex.xyz";
 
 // BETA_SOMON_PRIVATE_KEY PROD_SOMON_PRIVATE_KEY
 export const osp_wallet = new OSPWallet(
