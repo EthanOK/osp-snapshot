@@ -29,7 +29,7 @@ async function run() {
   }
 
   console.info(`- Creating new database: ${dbName}`);
-  await db.queryAsync(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
+  await db.queryAsync(`CREATE DATABASE IF NOT EXISTS ${dbName} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
 
   const schema = fs
     .readFileSync('./src/helpers/schema.sql', 'utf8')
