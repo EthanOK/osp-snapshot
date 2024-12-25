@@ -323,12 +323,16 @@ export class SnapShotSignClient {
         plugins: JSON.stringify({})
       };
       const spaceId = proposal.space;
-      const regex = /^((dev|beta|pre)\.\d+\.\d+|\d+(.\d+)?)\.osp$/;
+      const regex = /^((dev|beta|pre|prod)\.\d+\.\d+|\d+(.\d+)?)\.osp$/;
       if (!regex.test(spaceId)) {
         return {
           code: 400,
           error: "Invalid OSP Space Id"
         };
+      }
+      if (spaceId.startsWith("prod.")) {
+        // remove `prod.`
+        proposal.space = spaceId.replace("prod.", "");
       }
       let message;
       if (this.isISigner(web3)) {

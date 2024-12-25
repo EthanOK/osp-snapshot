@@ -1,6 +1,6 @@
 {
   "name": "@open-social-protocol/snapshot-sdk",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "This is the snapshot sdk for OSP",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
