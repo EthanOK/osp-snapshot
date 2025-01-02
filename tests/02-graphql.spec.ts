@@ -42,6 +42,19 @@ describe("Test SnapShot GraphQL Client", () => {
     }
   });
 
+  it("queryProposals by voter_not in spaceId", async () => {
+    // voter_not is null or "" all proposals in space
+    const proposals = await queryClient.queryProposals({
+      spaceIds: [spaceId_],
+      first: 10,
+      state: ProposalState.ACTIVE,
+      voter_not: "0xbc93cBC8F46f681aA4D31291CF5655B2f82AD2eE",
+      orderBy: "votes"
+    });
+    console.log("proposals number:", proposals.length);
+    console.log(JSON.stringify(proposals, null, 2));
+  });
+
   it("queryProposal by proposalId", async () => {
     const proposal = await queryClient.queryProposal(proposalId_);
     console.log("proposal author:", proposal.author);
